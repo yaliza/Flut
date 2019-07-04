@@ -3,18 +3,23 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/preferences_helper.dart';
 import 'package:http/http.dart' as http;
+import 'preferences.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    var routes = <String, WidgetBuilder>{
+      PreferencesPage.routeName: (BuildContext context) => new PreferencesPage(title: "Preferences"),
+    };
     return MaterialApp(
       title: 'Weather',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: 'Weather'),
+      routes: routes,
     );
   }
 }
@@ -50,6 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String temperature = '';
   String description = '';
   String icon = '';
+  static const IconData settingsIcon = IconData(0xe8b8, fontFamily: 'MaterialIcons');
 
   void makeApiRequest() async {
     String link = 'https://api.openweathermap.org/data/2.5/weather?'
@@ -76,7 +82,16 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
         appBar: AppBar(
         title: Text(widget.title),
-      ),
+          actions: <Widget>[
+            // action button
+            IconButton(
+              icon: Icon(settingsIcon),
+              onPressed: () {
+                Navigator.pushNamed(context, PreferencesPage.routeName);
+              },
+            )
+          ],
+        ),
       body: Center(
         child: ListView(
           children: <Widget>[
