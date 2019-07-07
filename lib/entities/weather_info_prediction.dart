@@ -13,9 +13,9 @@ class WeatherInfoPrediction {
   factory WeatherInfoPrediction.fromJson(Map<String, dynamic> json) {
     return WeatherInfoPrediction(
         dateTime: DateTime.fromMillisecondsSinceEpoch(json['dt'] * 1000),
-        temp: json['main']['temp'],
-        tempmin: json['main']['temp_min'],
-        tempmax: json['main']['temp_max'],
+        temp: double.parse(json['main']['temp'].toString()),
+        tempmin: double.parse((json['main']['temp_min']).toString()),
+        tempmax: double.parse(json['main']['temp_max'].toString()),
         pressure: double.parse(json['main']['pressure'].toString()),
         humidity: json['main']['humidity']);
   }
