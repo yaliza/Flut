@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/preferences_helper.dart';
+import 'package:flutter_app/weather_forecast.dart';
 import 'package:http/http.dart' as http;
 import 'preferences.dart';
 
@@ -89,7 +90,13 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.pushNamed(context, PreferencesPage.routeName);
               },
-            )
+            ),
+            IconButton(
+                icon: Icon(Icons.playlist_add),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => WeatherForecastPage(title: 'Forecast')));
+                }
+            ),
           ],
         ),
       body: Center(
