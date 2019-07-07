@@ -5,6 +5,7 @@ import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/weather_forecast.dart';
 import 'package:http/http.dart' as http;
 import 'preferences.dart';
+import 'charts.dart';
 
 void main() => runApp(MyApp());
 
@@ -95,6 +96,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 icon: Icon(Icons.playlist_add),
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => WeatherForecastPage(title: 'Forecast')));
+                }
+            ),
+            IconButton(
+                icon: Icon(Icons.details),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ChartsPage(title: 'Charts')));
                 }
             ),
           ],
