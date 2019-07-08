@@ -26,6 +26,7 @@ dependencies:
   shared_preferences: ^0.5.3
   fl_chart: ^0.1.1
   intl: ^0.15.8
+  archive: ^2.0.10
 
 dev_dependencies:
   flutter_test:
