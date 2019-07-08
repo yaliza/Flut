@@ -10,6 +10,12 @@ class PreferencesHelper {
   static final String _cityKey = "CITY";
   static final String _defaultCity = "minsk";
 
+  static final String _fillAreaBelowPlotKey = "FILL_AREA_BELOW_PLOT";
+  static final bool _defaultFillAreaBelowPlot = true;
+
+  static final String _showGridKey = "SHOW_GRID";
+  static final bool _defaultShowGrid = true;
+
   static Future<String> getAppId() async {
     return getString(_appIdKey, _defaultAppId);
   }
@@ -34,6 +40,22 @@ class PreferencesHelper {
     return setString(_cityKey, value);
   }
 
+  static Future<bool> getFillAreaBelowPlot() {
+    return getBoolean(_fillAreaBelowPlotKey, _defaultFillAreaBelowPlot);
+  }
+
+  static Future<bool> setFillAreBelowPlot(bool value) async {
+    return setBool(_fillAreaBelowPlotKey, value);
+  }
+
+  static Future<bool> getShowGrid() {
+    return getBoolean(_showGridKey, _defaultShowGrid);
+  }
+
+  static Future<bool> setShowGrid(bool value) async {
+    return setBool(_showGridKey, value);
+  }
+
   static Future<String> getString(String key, String def) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(key) ?? def;
@@ -42,5 +64,15 @@ class PreferencesHelper {
   static Future<bool> setString(String key, String value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setString(key, value);
+  }
+
+  static Future<bool> getBoolean(String key, bool def) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(key) ?? def;
+  }
+
+  static Future<bool> setBool(String key, bool value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setBool(key, value);
   }
 }

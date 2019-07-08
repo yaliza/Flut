@@ -6,18 +6,23 @@ class PreferencesPage extends StatefulWidget {
 
   static const String routeName = "/MyItemsPage";
   final String title;
+
   @override
   _PreferencesPageState createState() => new _PreferencesPageState();
 }
 
 class _PreferencesPageState extends State<PreferencesPage> {
-  String tempUnitValue = 'metric';
-  var tempUnits = ['metric', 'imperial'];
-  final appIdTextController = TextEditingController();
+  var tempUnits = ['metric', 'imperial'],
+      tempUnitValue = 'metric',
+      fillAreaBelow = true,
+      showGrid = true,
+      appIdTextController = TextEditingController();
 
   _PreferencesPageState() {
-    PreferencesHelper.getAppId().then((val) => changeAppId(val));
-    PreferencesHelper.getTempUnit().then((val) => changeTempUnit(val));
+    PreferencesHelper.getAppId().then(changeAppId);
+    PreferencesHelper.getTempUnit().then(changeTempUnit);
+    PreferencesHelper.getFillAreaBelowPlot().then(changeFillBelowPlotArea);
+    PreferencesHelper.getShowGrid().then(changeShowGrid);
   }
 
   @override
@@ -28,24 +33,19 @@ class _PreferencesPageState extends State<PreferencesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        appBar: new AppBar(
-          title: new Text("Preferences"),
-        ),
+    return Scaffold(
+        appBar: AppBar(title: new Text(widget.title)),
         body: Container(
-            child: new Column(children: [
-          new Row(
-            mainAxisSize: MainAxisSize.min,
+            child: Column(mainAxisSize: MainAxisSize.max, children: [
+          getSettingsTitle('General settings'),
+          Row(
             children: [
-              new Expanded(
-                child: Text('Temp unit: '),
-                flex: 1,
-              ),
+              new Expanded(child: Text('Temp unit: '), flex: 1),
               new Expanded(
                 child: DropdownButton<String>(
                     value: tempUnitValue,
                     items: tempUnits.map((String value) {
-                      return new DropdownMenuItem<String>(
+                      return DropdownMenuItem<String>(
                         value: value,
                         child: new Text(value),
                       );
@@ -55,23 +55,38 @@ class _PreferencesPageState extends State<PreferencesPage> {
               )
             ],
           ),
-          new Row(
-            mainAxisSize: MainAxisSize.min,
+          Row(
             children: [
-              new Expanded(
-                child: Text('Api key: '),
-                flex: 1,
-              ),
-              new Expanded(
-                child: TextField(
-                  controller: appIdTextController,
-                ),
-                flex: 3,
-              )
+              Expanded(child: Text('Api key: '), flex: 1),
+              Expanded(
+                  child: TextField(controller: appIdTextController), flex: 3)
+            ],
+          ),
+          getSettingsTitle('Charts settings'),
+          Row(
+            children: [
+              Expanded(child: Text('Fill area below plot: '), flex: 3),
+              Expanded(
+                  child: Checkbox(
+                      value: fillAreaBelow, onChanged: changeFillBelowPlotArea),
+                  flex: 1)
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(child: Text('Show grid: '), flex: 3),
+              Expanded(
+                  child: Checkbox(value: showGrid, onChanged: changeShowGrid),
+                  flex: 1)
             ],
           )
         ])));
   }
+
+  Widget getSettingsTitle(String title) => Container(
+        margin: const EdgeInsets.only(top: 15.0, bottom: 10.0),
+        child: Text(title, style: TextStyle(fontSize: 15)),
+      );
 
   void changeTempUnit(String value) {
     setState(() {
@@ -81,6 +96,20 @@ class _PreferencesPageState extends State<PreferencesPage> {
 
   void changeAppId(String value) {
     appIdTextController.text = value;
+  }
+
+  void changeFillBelowPlotArea(bool value) {
+    PreferencesHelper.setFillAreBelowPlot(value);
+    setState(() {
+      fillAreaBelow = value;
+    });
+  }
+
+  void changeShowGrid(bool value) {
+    PreferencesHelper.setShowGrid(value);
+    setState(() {
+      showGrid = value;
+    });
   }
 
   void _onAppIdChanged() {
