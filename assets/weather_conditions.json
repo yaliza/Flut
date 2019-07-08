@@ -1,0 +1,47 @@
+[
+  {
+    "description": "clear sky",
+    "day": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-sunny-icon.png",
+    "night": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-clear-night-icon.png"
+  },
+  {
+    "description": "few clouds",
+    "day": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-partly-sunny-icon.png",
+    "night": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-partly-cloudy-night-icon.png"
+  },
+  {
+    "description": "scattered clouds",
+    "day": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-cloudy-icon.png",
+    "night": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-cloudy-icon.png"
+  },
+  {
+    "description": "broken clouds",
+    "day": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-cloudy-icon.png",
+    "night": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-cloudy-icon.png"
+  },
+  {
+    "description": "shower rain",
+    "day": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-rain-icon.png",
+    "night": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-rain-icon.png"
+  },
+  {
+    "description": "rain",
+    "day": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-drizzle-icon.png",
+    "night": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-drizzle-icon.png"
+  },
+  {
+    "description": "thunderstorm",
+    "day": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-thunderstorm-icon.png",
+    "night": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-thunderstorm-icon.png"
+  },
+  {
+    "description": "snow",
+    "day": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-snow-icon.png",
+    "night": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-snow-icon.png"
+  },
+  {
+    "description": "mist",
+    "day": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-fog-icon.png",
+    "night": "https://support.apple.com/library/content/dam/edam/applecare/images/en_US/iOS/ios11-weather-fog-icon.png"
+  }
+]
