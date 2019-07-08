@@ -3,7 +3,7 @@ import 'package:flutter_app/preferences_helper.dart';
 import 'package:http/http.dart' as http;
 import 'api/request_helper.dart';
 import 'entities/weather_info_prediction.dart';
-import 'preferences.dart';
+import 'package:flutter_app/screens/preferences.dart';
 import 'dart:convert';
 
 

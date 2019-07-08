@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'entities/city.dart';
-import 'api/request_helper.dart';
+import 'package:flutter_app/entities/city.dart';
+import 'package:flutter_app/api/request_helper.dart';
 import 'dart:collection';
-import 'preferences_helper.dart';
+import 'package:flutter_app/preferences_helper.dart';
 
 class SearchCityPage extends StatefulWidget {
   SearchCityPage({Key key, this.title}) : super(key: key);

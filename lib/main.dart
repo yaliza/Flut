@@ -5,8 +5,8 @@ import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/weather_forecast.dart';
 import 'api/request_helper.dart';
 import 'entities/weather_data.dart';
-import 'preferences.dart';
-import 'charts.dart';
+import 'package:flutter_app/screens/preferences.dart';
+import 'package:flutter_app/screens/charts.dart';
 
 void main() => runApp(MyApp());
 

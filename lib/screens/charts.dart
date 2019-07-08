@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'api/request_helper.dart';
-import 'entities/weather_info_prediction.dart';
-import 'preferences_helper.dart';
+import 'package:flutter_app/api/request_helper.dart';
+import 'package:flutter_app/entities/weather_info_prediction.dart';
+import 'package:flutter_app/preferences_helper.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 

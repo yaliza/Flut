@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'preferences_helper.dart';
+import 'package:flutter_app/preferences_helper.dart';
 
 class PreferencesPage extends StatefulWidget {
   PreferencesPage({Key key, this.title}) : super(key: key);
