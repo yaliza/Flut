@@ -1,8 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/weather_forecast.dart';
+import 'package:intl/intl.dart';
 import 'api/request_helper.dart';
 import 'entities/weather_data.dart';
 import 'preferences.dart';
@@ -37,20 +36,50 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static List<String> dropdownValues = ['Minsk', 'Brest', 'Moscow'];
+  static List<String> dropdownValues = ['Minsk', 'Brest', 'Moscow', 'Vitebsk', 'London', 'Berlin'];
 
   String dropdownValue = dropdownValues[0];
   String temperature = '';
+  String mainDescription = '';
   String description = '';
   String icon = '';
+  int sunrise, sunset;
+  String sunriseText = '';
+  String sunsetText = '';
+  String tempUnitValue = '';
+
   static const IconData settingsIcon =
       IconData(0xe8b8, fontFamily: 'MaterialIcons');
 
-  void changeWeatherData(WeatherData data) {
+  void changeTempUnit(String value) {
     setState(() {
-      temperature = data.temp;
+      tempUnitValue = value;
+    });
+  }
+
+  void changeWeatherData(WeatherData data) {
+    PreferencesHelper.getTempUnit().then((val) => changeTempUnit(val));
+    setState(() {
+      temperature = data.temp.toString();
+
+      if (tempUnitValue == 'metric') {
+        temperature += '°C';
+      }
+      else {
+        temperature += '°F';
+      }
+
+      mainDescription = data.mainDescription;
       description = data.description;
       icon = data.icon;
+      sunrise = data.sunrise;
+      sunset = data.sunset;
+
+      sunriseText = 'Sunset: ' +
+          new DateFormat.Hm().format(new DateTime.fromMillisecondsSinceEpoch(sunrise * 1000)).toString();
+
+      sunsetText = 'Sunset: ' +
+          new DateFormat.Hm().format(new DateTime.fromMillisecondsSinceEpoch(sunset * 1000)).toString();;
     });
   }
 
@@ -138,16 +167,29 @@ class _MyHomePageState extends State<MyHomePage> {
                             placeholder: 'place_holder.jpg',
                             image: 'http://openweathermap.org/img/wn/' +
                                 icon +
-                                '@2x.png'),
+                                '@2x.png',
+                        ),
                         title: Text(
-                          temperature,
-                          style: TextStyle(fontSize: 22.0),
+                          temperature ?? '',
+                          style: TextStyle(fontSize: 32.0),
                         ),
-                        subtitle: Text(
-                          description,
-                          style: TextStyle(fontSize: 22.0),
-                        ),
+                        subtitle: Column(
+                          children:<Widget>[
+                            Text(
+                              description ?? '',
+                              style: TextStyle(fontSize: 22.0),
+                            ),
+                            Text(
+                                sunriseText ?? '',
+                              style: TextStyle(fontSize: 22.0),
+                            ),
+                            Text(
+                              sunsetText ?? '',
+                              style: TextStyle(fontSize: 22.0),
+                            ),
+                          ]
                       ),
+                      )
                     ],
                   ),
                 ),

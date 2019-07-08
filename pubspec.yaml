@@ -47,6 +47,7 @@ flutter:
     - assets/place_holder.jpg
     - assets/day.jpg
     - assets/night.jpg
+    - assets/weather_conditions.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:

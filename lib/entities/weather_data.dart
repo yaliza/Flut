@@ -1,17 +1,23 @@
 class WeatherData {
+  final String mainDescription;
   final String description;
   final String icon;
-  final String temp;
+  final int temp;
+  final int sunrise;
+  final int sunset;
 
-  WeatherData({this.description, this.icon, this.temp});
+  WeatherData({this.mainDescription, this.description, this.icon, this.temp, this.sunrise, this.sunset});
 
   String toString() {return temp.toString();}
 
   factory WeatherData.fromJson(Map<String, dynamic> json) {
     return WeatherData(
-      description: json['weather'][0]['main'],
+      mainDescription: json['weather'][0]['main'],
+      description: json['weather'][0]['description'],
       icon: json['weather'][0]['icon'],
-      temp: json['main']['temp'].toString(),
+      temp: json['main']['temp'].toInt(),
+      sunrise: json['sys']['sunrise'],
+      sunset: json['sys']['sunset'],
     );
   }
 }
