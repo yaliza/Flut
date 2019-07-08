@@ -70,6 +70,7 @@ class WeatherData {
 }
 */
 class _WeatherForecastPageState extends State<WeatherForecastPage> {
+  int _selectedIndex = 0;
   static List<String> dropdownValues = ['', 'Minsk', 'Brest', 'Moscow'];
 
   String dropdownValue = dropdownValues[0];
@@ -77,6 +78,12 @@ class _WeatherForecastPageState extends State<WeatherForecastPage> {
   ForecastData data;
 
   static const IconData settingsIcon = IconData(0xe8b8, fontFamily: 'MaterialIcons');
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   Widget getWeatherWidgets()
   {
@@ -165,7 +172,26 @@ class _WeatherForecastPageState extends State<WeatherForecastPage> {
                 getWeatherWidgets()
               ],
             )
-        )
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+      title: Text('Home'),
+     ),
+      BottomNavigationBarItem(
+      icon: Icon(Icons.business),
+      title: Text('Business'),
+    ) ,
+    BottomNavigationBarItem(
+    icon: Icon(Icons.school),
+    title: Text('School'),
+    ),
+    ],
+    currentIndex: _selectedIndex,
+    selectedItemColor: Colors.amber[800],
+    onTap: _onItemTapped,
+    )
     );
   }
 }

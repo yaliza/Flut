@@ -22,8 +22,64 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Weather'),
+      home: Home(),
       routes: routes,
+    );
+  }
+}
+
+class Home extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _HomeState();
+  }
+}
+
+class _HomeState extends State<Home> {
+  int _currentIndex = 0;
+  final List<Widget> _children = [
+    MyHomePage(title: 'Home'),
+    PreferencesPage(title: 'Preferences'),
+    ChartsPage(title: 'Charts'),
+    Text('Cities')
+  ];
+
+  void onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Weather'),
+      ),
+      body: _children[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.black54,
+        currentIndex: 0,
+        onTap: onTabTapped,
+        items: [
+          BottomNavigationBarItem(
+            icon: new Icon(Icons.home),
+            title: new Text('Home'),
+          ),
+          BottomNavigationBarItem(
+            icon: new Icon(Icons.settings),
+            title: new Text('Settings'),
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.show_chart),
+              title: Text('Chart')
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.location_city),
+              title: Text('Cities')
+          )
+        ],
+      ),
     );
   }
 }
@@ -70,7 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
       background = AssetImage("assets/night.jpg");
     }
     return Scaffold(
-        appBar: AppBar(
+        /*appBar: AppBar(
           title: Text(widget.title),
           actions: <Widget>[
             // action button
@@ -98,7 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           builder: (context) => ChartsPage(title: 'Charts')));
                 }),
           ],
-        ),
+        ),*/
         body: Container(
             decoration: BoxDecoration(
               image: DecorationImage(
