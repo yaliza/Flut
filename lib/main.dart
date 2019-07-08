@@ -22,8 +22,66 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Weather'),
+      home: Home(),
       routes: routes,
+    );
+  }
+}
+
+class Home extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _HomeState();
+  }
+}
+
+class _HomeState extends State<Home> {
+  int _currentIndex = 0;
+  static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  final List<Widget> _children = [
+    MyHomePage(title: 'Home'),
+    PreferencesPage(title: 'Preferences'),
+    ChartsPage(title: 'Charts'),
+    WeatherForecast()
+  ];
+
+  void onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Weather'),
+      ),
+      body: _children[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: onTabTapped,
+        currentIndex: _currentIndex,
+        selectedItemColor: Colors.amber[800],
+        unselectedItemColor: Colors.blue,
+        items: [
+          BottomNavigationBarItem(
+            icon: new Icon(Icons.home),
+            title: new Text('Home', style: new TextStyle(color: Colors.blue)),
+          ),
+          BottomNavigationBarItem(
+            icon: new Icon(Icons.settings),
+            title: new Text('Settings', style: new TextStyle(color: Colors.blue)),
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.show_chart),
+              title: Text('Chart', style: new TextStyle(color: Colors.blue))
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.location_city),
+              title: Text('Cities', style: new TextStyle(color: Colors.blue))
+          )
+        ],
+      ),
     );
   }
 }
@@ -70,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
       background = AssetImage("assets/night.jpg");
     }
     return Scaffold(
-        appBar: AppBar(
+        /*appBar: AppBar(
           title: Text(widget.title),
           actions: <Widget>[
             // action button
@@ -98,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           builder: (context) => ChartsPage(title: 'Charts')));
                 }),
           ],
-        ),
+        ),*/
         body: Container(
             decoration: BoxDecoration(
               image: DecorationImage(

@@ -34,7 +34,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: new Text(widget.title)),
+        //appBar: AppBar(title: new Text(widget.title)),
         body: Container(
             child: Column(mainAxisSize: MainAxisSize.max, children: [
           getSettingsTitle('General settings'),

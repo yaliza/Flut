@@ -1,8 +1,92 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/preferences_helper.dart';
 import 'package:http/http.dart' as http;
+import 'api/request_helper.dart';
+import 'entities/weather_info_prediction.dart';
 import 'preferences.dart';
 import 'dart:convert';
+
+
+class WeatherForecast extends StatefulWidget{
+  @override
+  _WeatherForecastState createState() => _WeatherForecastState();
+}
+
+class _WeatherForecastState extends State<WeatherForecast> {
+
+  List<WeatherInfoPrediction> predictions;
+
+  _WeatherForecastState() {
+    RequestHelper.getPredictions(
+            (data) => changeWeatherData(data),
+            () => print('error'));
+  }
+
+
+  void changeWeatherData(List<WeatherInfoPrediction> predictions) {
+    setState(() {
+      this.predictions = predictions;
+    });
+  }
+
+  String getWeekDay(int i) {
+    String res;
+    switch(i) {
+      case 1:
+        res = "Monday";
+        break;
+      case 2:
+        res = "Tuesday";
+        break;
+      case 3:
+        res = "Wednesday";
+        break;
+      case 4:
+        res = "Thursday";
+        break;
+      case 5:
+        res = "Friday";
+        break;
+      case 6:
+        res = "Saturday";
+        break;
+      case 7:
+        res = "Sunday";
+        break;
+    }
+    return res;
+  }
+  Widget getWeatherWidgets()
+  {
+    List<Widget> list = new List<Widget>();
+
+    if(predictions != null) {
+      for (var i = 0; i < predictions.length; i++) {
+        List<Widget> contents = new List<Widget>();
+        contents.add(new Text(getWeekDay(predictions[i].dateTime.weekday)));
+        contents.add(new Text(predictions[i].tempmax.toString()));
+        contents.add(new Text(predictions[i].tempmin.toString()));
+        list.add(new Row(children: contents));
+      }
+    }
+    return new Column(children: list);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: Center(
+            child: ListView(
+              children: <Widget>[
+                getWeatherWidgets()
+              ],
+            )
+        ),
+    );
+  }
+
+}
+
 
 class WeatherForecastPage extends StatefulWidget {
 
@@ -70,6 +154,7 @@ class WeatherData {
 }
 */
 class _WeatherForecastPageState extends State<WeatherForecastPage> {
+  int _selectedIndex = 0;
   static List<String> dropdownValues = ['', 'Minsk', 'Brest', 'Moscow'];
 
   String dropdownValue = dropdownValues[0];
@@ -77,6 +162,12 @@ class _WeatherForecastPageState extends State<WeatherForecastPage> {
   ForecastData data;
 
   static const IconData settingsIcon = IconData(0xe8b8, fontFamily: 'MaterialIcons');
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   Widget getWeatherWidgets()
   {
@@ -165,7 +256,26 @@ class _WeatherForecastPageState extends State<WeatherForecastPage> {
                 getWeatherWidgets()
               ],
             )
-        )
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+      title: Text('Home'),
+     ),
+      BottomNavigationBarItem(
+      icon: Icon(Icons.business),
+      title: Text('Business'),
+    ) ,
+    BottomNavigationBarItem(
+    icon: Icon(Icons.school),
+    title: Text('School'),
+    ),
+    ],
+    currentIndex: _selectedIndex,
+    selectedItemColor: Colors.amber[800],
+    onTap: _onItemTapped,
+    )
     );
   }
 }
