@@ -42,7 +42,7 @@ class _HomeState extends State<Home> {
     MyHomePage(title: 'Home'),
     PreferencesPage(title: 'Preferences'),
     ChartsPage(title: 'Charts'),
-    Text('Cities')
+    WeatherForecast()
   ];
 
   void onTabTapped(int index) {
