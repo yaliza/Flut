@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/weather_forecast.dart';
-import 'package:http/http.dart' as http;
+import 'api/request_helper.dart';
+import 'entities/weather_data.dart';
 import 'preferences.dart';
 import 'charts.dart';
 
@@ -13,7 +14,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var routes = <String, WidgetBuilder>{
-      PreferencesPage.routeName: (BuildContext context) => new PreferencesPage(title: "Preferences"),
+      PreferencesPage.routeName: (BuildContext context) =>
+          new PreferencesPage(title: "Preferences"),
     };
     return MaterialApp(
       title: 'Weather',
@@ -34,56 +36,42 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class WeatherData {
-  final String description;
-  final String icon;
-  final String temp;
-
-  WeatherData({this.description, this.icon, this.temp});
-
-  factory WeatherData.fromJson(Map<String, dynamic> json) {
-    return WeatherData(
-      description: json['weather'][0]['main'],
-      icon: json['weather'][0]['icon'],
-      temp: json['main']['temp'].toString(),
-    );
-  }
-}
-
 class _MyHomePageState extends State<MyHomePage> {
-  static List<String> dropdownValues = ['', 'Minsk', 'Brest', 'Moscow'];
+  static List<String> dropdownValues = ['Minsk', 'Brest', 'Moscow'];
 
   String dropdownValue = dropdownValues[0];
   String temperature = '';
   String description = '';
   String icon = '';
-  static const IconData settingsIcon = IconData(0xe8b8, fontFamily: 'MaterialIcons');
+  static const IconData settingsIcon =
+      IconData(0xe8b8, fontFamily: 'MaterialIcons');
 
-  void makeApiRequest() async {
-    String link = 'https://api.openweathermap.org/data/2.5/weather?'
-        'q=' + await  PreferencesHelper.getCity() +
-        '&units=' + await PreferencesHelper.getTempUnit() +
-        '&appid=' + await PreferencesHelper.getAppId();
+  void changeWeatherData(WeatherData data) {
+    setState(() {
+      temperature = data.temp;
+      description = data.description;
+      icon = data.icon;
+    });
+  }
 
-    final response = await http.get(link);
-
-    if (response.statusCode == 200) {
-      setState(() {
-        WeatherData data = WeatherData.fromJson(json.decode(response.body));
-        temperature = data.temp;
-        description = data.description;
-        icon = data.icon;
-      });
-    } else {
-      throw Exception('Failed to load post');
-    }
+  _MyHomePageState() {
+    RequestHelper.getCurrentWeather(
+            (data) => changeWeatherData(data),
+            () => print('error'));
   }
 
   @override
   Widget build(BuildContext context) {
+    AssetImage background;
+    if (new DateTime.now().hour > 6 && new DateTime.now().hour < 20) {
+      background = AssetImage("assets/day.jpg");
+    }
+    else {
+      background = AssetImage("assets/night.jpg");
+    }
     return Scaffold(
         appBar: AppBar(
-        title: Text(widget.title),
+          title: Text(widget.title),
           actions: <Widget>[
             // action button
             IconButton(
@@ -95,54 +83,75 @@ class _MyHomePageState extends State<MyHomePage> {
             IconButton(
                 icon: Icon(Icons.playlist_add),
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => WeatherForecastPage(title: 'Forecast')));
-                }
-            ),
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              WeatherForecastPage(title: 'Forecast')));
+                }),
             IconButton(
                 icon: Icon(Icons.details),
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => ChartsPage(title: 'Charts')));
-                }
-            ),
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ChartsPage(title: 'Charts')));
+                }),
           ],
         ),
-      body: Center(
-        child: ListView(
-          children: <Widget>[
-            DropdownButton<String>(
-              value: dropdownValue,
-              onChanged: (String newValue) {
-                setState(() {
-                  dropdownValue = newValue;
-                  PreferencesHelper.setCity(dropdownValue);
-                  makeApiRequest();
-                });
-              },
-              items: dropdownValues.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value,
-                    style: TextStyle(fontSize: 22.0)
+        body: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: background,
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: ListView(
+              children: <Widget>[
+                Center(
+                  child: DropdownButton<String>(
+                    value: dropdownValue,
+                    onChanged: (String newValue) {
+                      setState(() {
+                        dropdownValue = newValue;
+                        PreferencesHelper.setCity(dropdownValue);
+                        RequestHelper.getCurrentWeather(
+                            (data) => changeWeatherData(data),
+                            () => print('error'));
+                      });
+                    },
+                    items: dropdownValues
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value, style: TextStyle(fontSize: 22.0)),
+                      );
+                    }).toList(),
                   ),
-                );
-              }).toList(),
-            ),
-            Text(
-              temperature,
-              style: TextStyle(fontSize: 22.0),
-            ),
-            Text(
-              description,
-              style: TextStyle(fontSize: 22.0),
-            ),
-            FadeInImage.assetNetwork(
-                placeholder: 'place_holder.jpg',
-                image: 'http://openweathermap.org/img/wn/' + icon + '@2x.png'
-            ),
-          ],
-        )
-      )
-    );
+                ),
+                Card(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      ListTile(
+                        leading: FadeInImage.assetNetwork(
+                            placeholder: 'place_holder.jpg',
+                            image: 'http://openweathermap.org/img/wn/' +
+                                icon +
+                                '@2x.png'),
+                        title: Text(
+                          temperature,
+                          style: TextStyle(fontSize: 22.0),
+                        ),
+                        subtitle: Text(
+                          description,
+                          style: TextStyle(fontSize: 22.0),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            )));
   }
 }
