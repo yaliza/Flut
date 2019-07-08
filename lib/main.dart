@@ -37,6 +37,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
+  static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   final List<Widget> _children = [
     MyHomePage(title: 'Home'),
     PreferencesPage(title: 'Preferences'),
@@ -58,25 +59,26 @@ class _HomeState extends State<Home> {
       ),
       body: _children[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black54,
-        currentIndex: 0,
         onTap: onTabTapped,
+        currentIndex: _currentIndex,
+        selectedItemColor: Colors.amber[800],
+        unselectedItemColor: Colors.blue,
         items: [
           BottomNavigationBarItem(
             icon: new Icon(Icons.home),
-            title: new Text('Home'),
+            title: new Text('Home', style: new TextStyle(color: Colors.blue)),
           ),
           BottomNavigationBarItem(
             icon: new Icon(Icons.settings),
-            title: new Text('Settings'),
+            title: new Text('Settings', style: new TextStyle(color: Colors.blue)),
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.show_chart),
-              title: Text('Chart')
+              title: Text('Chart', style: new TextStyle(color: Colors.blue))
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.location_city),
-              title: Text('Cities')
+              title: Text('Cities', style: new TextStyle(color: Colors.blue))
           )
         ],
       ),
