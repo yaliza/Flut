@@ -9,13 +9,8 @@ import 'package:flutter_app/entities/city.dart';
 class RequestHelper {
   static void getPredictions(
       Function(List<WeatherInfoPrediction>) callback, Function error) async {
-    String link = 'http://api.openweathermap.org/data/2.5/forecast?'
-            'q=' +
-        await PreferencesHelper.getCity() +
-        '&units=' +
-        await PreferencesHelper.getTempUnit() +
-        '&appid=' +
-        await PreferencesHelper.getAppId();
+    String link =
+        'http://api.openweathermap.org/data/2.5/forecast?q=${await PreferencesHelper.getCity()}&units=${await PreferencesHelper.getTempUnit()}&appid=${await PreferencesHelper.getAppId()}';
 
     final response = await http.get(link);
 
@@ -31,13 +26,8 @@ class RequestHelper {
 
   static void getCurrentWeather(
       Function(WeatherData) callback, Function error) async {
-    String link = 'https://api.openweathermap.org/data/2.5/weather?'
-            'q=' +
-        await PreferencesHelper.getCity() +
-        '&units=' +
-        await PreferencesHelper.getTempUnit() +
-        '&appid=' +
-        await PreferencesHelper.getAppId();
+    String link =
+        'https://api.openweathermap.org/data/2.5/weather?q=${await PreferencesHelper.getCity()}&units=${await PreferencesHelper.getTempUnit()}&appid=${await PreferencesHelper.getAppId()}';
 
     final response = await http.get(link);
 
@@ -49,7 +39,22 @@ class RequestHelper {
     }
   }
 
-  static void getCitiesList(Function(List<City>) callback, Function error) async {
+  static void getCurrentWeatherByIds(
+      Function(List<WeatherData>) callback, Function error, List<String> citiesIds) async {
+    String link =
+        'http://api.openweathermap.org/data/2.5/group?id=${citiesIds.join(',')}&units=${await PreferencesHelper.getTempUnit()}&appid=${await PreferencesHelper.getAppId()}';
+    final response = await http.get(link);
+
+    if (response.statusCode == 200) {
+      List<WeatherData> data = (json.decode(response.body)['list'] as List).map((js) => WeatherData.fromJsonCitiesIds(js)).toList();
+      callback(data);
+    } else {
+      error();
+    }
+  }
+
+  static void getCitiesList(
+      Function(List<City>) callback, Function error) async {
     var link = 'http://bulk.openweathermap.org/sample/city.list.json.gz';
     final response = await http.get(link);
     var bytes = GZipDecoder().decodeBytes(response.bodyBytes);

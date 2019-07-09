@@ -17,14 +17,14 @@ class SearchCityPage extends StatefulWidget {
 class _SearchCityPageState extends State<SearchCityPage> {
   List<City> cities = [];
   List<City> filteredCities = [];
-  HashSet<String> markedCities;
+  HashSet<String> markedCitiesIds;
 
   String filter = '';
   TextEditingController controller = TextEditingController();
 
   _SearchCityPageState() {
     RequestHelper.getCitiesList(changeCitiesList, () => {});
-    PreferencesHelper.getMarkedCities()
+    PreferencesHelper.getMarkedCitiesIds()
         .then((list) => changeMarkedCitiesList(list));
   }
 
@@ -63,9 +63,9 @@ class _SearchCityPageState extends State<SearchCityPage> {
                           bottom: 10.0, top: 10.0, start: 5.0, end: 5.0),
                       child: Text(filteredCities[index].name)),
                   Checkbox(
-                      value: markedCities.contains(filteredCities[index].name),
+                      value: markedCitiesIds.contains(filteredCities[index].id),
                       onChanged: (val) =>
-                          changeMarkedCity(filteredCities[index].name, val))
+                          changeMarkedCity(filteredCities[index].id, val))
                 ]));
               }))
     ]));
@@ -75,14 +75,10 @@ class _SearchCityPageState extends State<SearchCityPage> {
     filterCities();
   }
 
-  void changeMarkedCity(String cityName, bool value) {
-    if (value == false) {
-      markedCities.remove(cityName);
-    } else {
-      markedCities.add(cityName);
-    }
+  void changeMarkedCity(String id, bool value) {
+    value == false ? markedCitiesIds.remove(id) : markedCitiesIds.add(id);
     setState(() {});
-    PreferencesHelper.setMarkedCities(markedCities.toList());
+    PreferencesHelper.setMarkedCitiesIds(markedCitiesIds.toList());
   }
 
   void filterCities() async {
@@ -103,11 +99,10 @@ class _SearchCityPageState extends State<SearchCityPage> {
   }
 
   void changeMarkedCitiesList(List<String> list) {
-    print(list);
     setState(() {
-      markedCities = HashSet<String>();
+      markedCitiesIds = HashSet<String>();
       if (list != null) {
-        list.forEach((str) => markedCities.add(str));
+        list.forEach((str) => markedCitiesIds.add(str));
       }
     });
   }

@@ -5,7 +5,7 @@ import 'package:flutter_app/api/request_helper.dart';
 import 'package:flutter_app/entities/weather_info_prediction.dart';
 import 'package:flutter_app/preferences_helper.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_app/utils.dart';
 
 class ChartsPage extends StatefulWidget {
   ChartsPage({Key key, this.title}) : super(key: key);
@@ -19,7 +19,6 @@ class ChartsPage extends StatefulWidget {
 
 class _ChartsPageState extends State<ChartsPage> {
   var weatherInfoPredictions = List<WeatherInfoPrediction>(),
-      formatter = new DateFormat('MMMM d'),
       cityValue = '',
       tempUnitValue = '',
       dots = [FlSpot(0, 20.0)],
@@ -176,13 +175,13 @@ class _ChartsPageState extends State<ChartsPage> {
   String getDateLabel(double value) {
     switch (value.toInt()) {
       case 5:
-        return formatter.format(DateTime.now());
+        return Utils.formatDateFullFormat(DateTime.now());
       case 15:
-        return formatter.format(DateTime.now().add(Duration(days: 1)));
+        return Utils.formatDateFullFormat(DateTime.now().add(Duration(days: 1)));
       case 25:
-        return formatter.format(DateTime.now().add(Duration(days: 2)));
+        return Utils.formatDateFullFormat(DateTime.now().add(Duration(days: 2)));
       case 35:
-        return formatter.format(DateTime.now().add(Duration(days: 3)));
+        return Utils.formatDateFullFormat(DateTime.now().add(Duration(days: 3)));
     }
     return "";
   }

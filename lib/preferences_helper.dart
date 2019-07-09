@@ -50,11 +50,11 @@ class PreferencesHelper {
     return setBool(_fillAreaBelowPlotKey, value);
   }
 
-  static Future<List<String>> getMarkedCities() async {
+  static Future<List<String>> getMarkedCitiesIds() async {
     return getStringList(_citiesKey);
   }
 
-  static Future<bool> setMarkedCities(List<String> list) async {
+  static Future<bool> setMarkedCitiesIds(List<String> list) async {
     return setStringList(_citiesKey, list);
   }
 
