@@ -3,6 +3,7 @@ import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/entities/weather_data.dart';
 import 'package:flutter_app/api/request_helper.dart';
 import 'package:flutter_app/utils.dart';
+import 'search_city.dart';
 
 class CitiesPage extends StatefulWidget {
   CitiesPage({Key key, this.title}) : super(key: key);
@@ -27,54 +28,87 @@ class _CitiesPageState extends State<CitiesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ListView.builder(
-      itemCount: weatherData.length,
-      itemBuilder: (context, index) {
-        return Column(
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            Row(children: [
-              Padding(
-                padding: EdgeInsets.only(right: 20.0),
-                child: FadeInImage.assetNetwork(
-                  placeholder: Utils.getDefaultWeatherIcon(),
-                  height: 70.0,
-                  width: 70.0,
-                  image: Utils.getWeatherIconUrl(weatherData[index].icon),
-                ),
+        body: Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
+      RaisedButton(
+          onPressed: navigateChangeCitiesList,
+          textColor: Colors.white,
+          padding: const EdgeInsets.all(0.0),
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: <Color>[
+                  Color(0xFF0D47A1),
+                  Color(0xFF1976D2),
+                  Color(0xFF42A5F5),
+                ],
               ),
-              Expanded(
-                  flex: 5,
-                  child:
-                      Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(weatherData[index].cityName,
-                          style: TextStyle(fontSize: 18)),
+            ),
+            padding: const EdgeInsets.all(10.0),
+            child: const Text('Change cities list',
+                style: TextStyle(fontSize: 20)),
+          )),
+      Expanded(
+        flex: 1,
+        child: ListView.builder(
+          itemCount: weatherData.length,
+          itemBuilder: (context, index) {
+            return Column(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Row(children: [
+                  Padding(
+                    padding: EdgeInsets.only(right: 20.0),
+                    child: FadeInImage.assetNetwork(
+                      placeholder: Utils.getDefaultWeatherIcon(),
+                      height: 70.0,
+                      width: 70.0,
+                      image: Utils.getWeatherIconUrl(weatherData[index].icon),
                     ),
-                    Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                            Utils.formatDateTimeFormat(weatherData[index].dt, weatherData[index].timezone),
-                            style: TextStyle(fontSize: 14))),
-                  ])),
-              Expanded(
-                flex: 2,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                      '${weatherData[index].temp} ${Utils.getTempUnit(tempUnitValue)}',
-                      style: TextStyle(fontSize: 16)),
-                ),
-              )
-            ]),
-            Padding(
-                padding: EdgeInsets.only(left: 90.0),
-                child: Container(color: Colors.black26, height: 1))
-          ],
-        );
-      },
-    ));
+                  ),
+                  Expanded(
+                      flex: 5,
+                      child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: <Widget>[
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(weatherData[index].cityName,
+                                  style: TextStyle(fontSize: 18)),
+                            ),
+                            Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                    Utils.formatDateTimeFormat(
+                                        weatherData[index].dt,
+                                        weatherData[index].timezone),
+                                    style: TextStyle(fontSize: 14))),
+                          ])),
+                  Expanded(
+                    flex: 2,
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                          '${weatherData[index].temp} ${Utils.getTempUnit(tempUnitValue)}',
+                          style: TextStyle(fontSize: 16)),
+                    ),
+                  )
+                ]),
+                Padding(
+                    padding: EdgeInsets.only(left: 90.0),
+                    child: Container(color: Colors.black26, height: 1))
+              ],
+            );
+          },
+        ),
+      ),
+    ]));
+  }
+
+  void navigateChangeCitiesList() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SearchCityPage(title: 'Search city')));
   }
 
   void changeCitiesList(List<String> value) {

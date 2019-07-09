@@ -58,10 +58,7 @@ class _SearchCityPageState extends State<SearchCityPage> {
               itemBuilder: (BuildContext context, int index) {
                 return Card(
                     child: Row(children: <Widget>[
-                  Padding(
-                      padding: EdgeInsetsDirectional.only(
-                          bottom: 10.0, top: 10.0, start: 5.0, end: 5.0),
-                      child: Text(filteredCities[index].name)),
+                  Expanded(flex: 1, child: Text(filteredCities[index].name)),
                   Checkbox(
                       value: markedCitiesIds.contains(filteredCities[index].id),
                       onChanged: (val) =>
