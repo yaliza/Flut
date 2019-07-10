@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/preferences_helper.dart';
 import 'package:http/http.dart' as http;
 import 'api/request_helper.dart';
-import 'entities/weather_info_prediction.dart';
+import 'entities/weather_info_predictions.dart';
 import 'package:flutter_app/screens/preferences.dart';
 import 'dart:convert';
 
@@ -14,16 +14,16 @@ class WeatherForecast extends StatefulWidget{
 
 class _WeatherForecastState extends State<WeatherForecast> {
 
-  List<WeatherInfoPrediction> predictions;
+  WeatherInfoPredictions predictions;
 
   _WeatherForecastState() {
     RequestHelper.getPredictions(
             (data) => changeWeatherData(data),
-            () => print('error'));
+            () => print('error'), "minsk");
   }
 
 
-  void changeWeatherData(List<WeatherInfoPrediction> predictions) {
+  void changeWeatherData(WeatherInfoPredictions predictions) {
     setState(() {
       this.predictions = predictions;
     });
@@ -61,11 +61,11 @@ class _WeatherForecastState extends State<WeatherForecast> {
     List<Widget> list = new List<Widget>();
 
     if(predictions != null) {
-      for (var i = 0; i < predictions.length; i++) {
+      for (var i = 0; i < predictions.predictions.length; i++) {
         List<Widget> contents = new List<Widget>();
-        contents.add(new Text(getWeekDay(predictions[i].dateTime.weekday)));
-        contents.add(new Text(predictions[i].tempmax.toString()));
-        contents.add(new Text(predictions[i].tempmin.toString()));
+        contents.add(new Text(getWeekDay(predictions.predictions[i].dateTime.weekday)));
+        contents.add(new Text(predictions.predictions[i].tempmax.toString()));
+        contents.add(new Text(predictions.predictions[i].tempmin.toString()));
         list.add(new Row(children: contents));
       }
     }
@@ -87,7 +87,7 @@ class _WeatherForecastState extends State<WeatherForecast> {
 
 }
 
-
+/*
 class WeatherForecastPage extends StatefulWidget {
 
   static const String routeName = "/WeatherForecastPage";
@@ -136,7 +136,7 @@ class DayWeatherData {
     this.icon = icon;
   }
 }
-/*
+
 class WeatherData {
   final String description;
   final String icon;
@@ -152,7 +152,7 @@ class WeatherData {
     );
   }
 }
-*/
+
 class _WeatherForecastPageState extends State<WeatherForecastPage> {
   int _selectedIndex = 0;
   static List<String> dropdownValues = ['', 'Minsk', 'Brest', 'Moscow'];
@@ -279,3 +279,4 @@ class _WeatherForecastPageState extends State<WeatherForecastPage> {
     );
   }
 }
+*/
