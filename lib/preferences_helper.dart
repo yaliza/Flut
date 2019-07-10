@@ -1,4 +1,10 @@
+import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'entities/icons.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class PreferencesHelper {
   static final String _appIdKey = "APP_ID";
@@ -9,6 +15,12 @@ class PreferencesHelper {
 
   static final String _cityKey = "CITY";
   static final String _defaultCity = "minsk";
+
+  static List<WeatherIcon> icons;
+
+  static Future<String> getIcons(Function(List<WeatherIcon>) callback, Function error) async {
+    return await rootBundle.loadString('assets/weather_conditions.json').then((val) => json.decode(val));
+  }
 
   static Future<String> getAppId() async {
     return getString(_appIdKey, _defaultAppId);

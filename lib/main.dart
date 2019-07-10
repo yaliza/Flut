@@ -3,9 +3,12 @@ import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/weather_forecast.dart';
 import 'package:intl/intl.dart';
 import 'api/request_helper.dart';
+import 'entities/icons.dart';
 import 'entities/weather_data.dart';
 import 'preferences.dart';
 import 'charts.dart';
+
+import 'package:flutter/services.dart' show rootBundle;
 
 void main() => runApp(MyApp());
 
@@ -83,10 +86,20 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void changeIconsValue(List<WeatherIcon> value) {
+    setState(() {
+      PreferencesHelper.icons = (value as List).map((js) => WeatherIcon.fromJson(js)).toList();
+    });
+  }
+
   _MyHomePageState() {
     RequestHelper.getCurrentWeather(
             (data) => changeWeatherData(data),
             () => print('error'));
+    PreferencesHelper.getIcons(
+            (json) => changeIconsValue(json),
+            () => print('error')
+    );
   }
 
   @override
@@ -165,9 +178,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       ListTile(
                         leading: FadeInImage.assetNetwork(
                             placeholder: 'place_holder.jpg',
-                            image: 'http://openweathermap.org/img/wn/' +
-                                icon +
-                                '@2x.png',
+                            image: ''
+//                            PreferencesHelper.icons[0].day,
                         ),
                         title: Text(
                           temperature ?? '',
