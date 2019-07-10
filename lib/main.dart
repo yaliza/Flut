@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/preferences_helper.dart';
-import 'api/request_helper.dart';
-import 'entities/weather_data.dart';
-import 'package:flutter_app/screens/preferences.dart';
 import 'package:flutter_app/screens/charts.dart';
 import 'package:flutter_app/screens/cities.dart';
+import 'package:flutter_app/screens/preferences.dart';
+
+import 'api/request_helper.dart';
+import 'entities/weather_data.dart';
 import 'utils.dart';
 
 void main() => runApp(MyApp());
@@ -190,13 +191,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           Text(
                             weatherData != null
-                                ? 'Sunset: ${formatDateTimeFormat(weatherData.sunrise * 1000, weatherData.timezone)}'
+                                ? 'Sunrise: ${formatDateTimeFormat(weatherData.sunrise * 1000, weatherData.timezone)}'
                                 : '',
                             style: TextStyle(fontSize: 22.0),
                           ),
                           Text(
                             weatherData != null
-                                ? 'Sunset: ${formatDateTimeFormat(weatherData.sunset * 1000, weatherData.timezone)}}'
+                                ? 'Sunset: ${formatDateTimeFormat(weatherData.sunset * 1000, weatherData.timezone)}'
                                 : '',
                             style: TextStyle(fontSize: 22.0),
                           ),

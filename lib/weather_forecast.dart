@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app/preferences_helper.dart';
-import 'package:http/http.dart' as http;
-import 'api/request_helper.dart';
-import 'entities/weather_info_prediction.dart';
 import 'package:flutter_app/screens/preferences.dart';
-import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+import 'api/request_helper.dart';
+import 'entities/weather_info_predictions.dart';
 
 
 class WeatherForecast extends StatefulWidget{
@@ -13,17 +15,26 @@ class WeatherForecast extends StatefulWidget{
 }
 
 class _WeatherForecastState extends State<WeatherForecast> {
-
-  List<WeatherInfoPrediction> predictions;
+  WeatherInfoPredictions predictions;
+  String cityId;
 
   _WeatherForecastState() {
+    PreferencesHelper.getCityId().then((val) => changeCityId(val));
     RequestHelper.getPredictions(
             (data) => changeWeatherData(data),
-            () => print('error'));
+            () => print('error'),
+            cityId
+    );
+  }
+
+  void changeCityId(String cityId) {
+    setState(() {
+      this.cityId = cityId;
+    });
   }
 
 
-  void changeWeatherData(List<WeatherInfoPrediction> predictions) {
+  void changeWeatherData(WeatherInfoPredictions predictions) {
     setState(() {
       this.predictions = predictions;
     });
@@ -61,11 +72,11 @@ class _WeatherForecastState extends State<WeatherForecast> {
     List<Widget> list = new List<Widget>();
 
     if(predictions != null) {
-      for (var i = 0; i < predictions.length; i++) {
+      for (var i = 0; i < predictions.predictions.length; i++) {
         List<Widget> contents = new List<Widget>();
-        contents.add(new Text(getWeekDay(predictions[i].dateTime.weekday)));
-        contents.add(new Text(predictions[i].tempmax.toString()));
-        contents.add(new Text(predictions[i].tempmin.toString()));
+        contents.add(new Text(getWeekDay(predictions.predictions[i].dateTime.weekday)));
+        contents.add(new Text(predictions.predictions[i].tempmax.toString()));
+        contents.add(new Text(predictions.predictions[i].tempmin.toString()));
         list.add(new Row(children: contents));
       }
     }

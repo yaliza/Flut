@@ -16,7 +16,18 @@ class PreferencesHelper {
   static final String _showGridKey = "SHOW_GRID";
   static final bool _defaultShowGrid = true;
 
-  static final String _citiesKey = "CITIES";
+  static final String _cityIdKey = "DEFAULT_CITY_ID";
+  static final String _defaultCityId = "625144";
+
+  static Future<String> getCityId() async {
+    return getString(_cityIdKey, _defaultCityId);
+  }
+
+  static final _citiesKey = 'CITIES';
+
+  static Future<bool> setCityId(String value) {
+    return setString(_cityIdKey, value);
+  }
 
   static Future<String> getAppId() async {
     return getString(_appIdKey, _defaultAppId);
