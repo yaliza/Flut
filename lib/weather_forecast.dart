@@ -56,7 +56,23 @@ class _WeatherForecastState extends State<WeatherForecast> {
     }
     return res;
   }
-  Widget getWeatherWidgets()
+
+  Row hourlyPredictions() {
+    List<Widget> list = new List<Widget>();
+
+    if(predictions != null) {
+      for (var i = 0; i < 8; i++) {
+        List<Widget> contents = new List<Widget>();
+        contents.add(new Text(getWeekDay(predictions.predictions[i].dateTime.weekday)));
+        contents.add(new Text(predictions.predictions[i].tempmax.toString()));
+        contents.add(new Text(predictions.predictions[i].tempmin.toString()));
+        list.add(new Column(children: contents));
+      }
+    }
+    return new Row(children: list);
+  }
+
+  Column dailyPredictions()
   {
     List<Widget> list = new List<Widget>();
 
@@ -78,7 +94,8 @@ class _WeatherForecastState extends State<WeatherForecast> {
         body: Center(
             child: ListView(
               children: <Widget>[
-                getWeatherWidgets()
+                hourlyPredictions(),
+                dailyPredictions()
               ],
             )
         ),
