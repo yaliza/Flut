@@ -4,6 +4,7 @@ import 'package:flutter_app/entities/weather_data.dart';
 import 'package:flutter_app/api/request_helper.dart';
 import 'package:flutter_app/utils.dart';
 import 'search_city.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class CitiesPage extends StatefulWidget {
   CitiesPage({Key key, this.title}) : super(key: key);
@@ -17,12 +18,12 @@ class CitiesPage extends StatefulWidget {
 
 class _CitiesPageState extends State<CitiesPage> {
   List<String> citiesIds = [];
-  List<WeatherData> weatherData = [];
+  List<WeatherData> weatherData;
   String tempUnitValue = 'metric';
 
   _CitiesPageState() {
-    PreferencesHelper.getMarkedCitiesIds().then(changeCitiesList);
-    PreferencesHelper.getTempUnit().then(changeTempUnitValue);
+    PreferencesHelper.getMarkedCitiesIds().then(_changeCitiesList);
+    PreferencesHelper.getTempUnit().then(_changeTempUnitValue);
   }
 
   @override
@@ -48,60 +49,63 @@ class _CitiesPageState extends State<CitiesPage> {
                 style: TextStyle(fontSize: 20)),
           )),
       Expanded(
-        flex: 1,
-        child: ListView.builder(
-          itemCount: weatherData.length,
-          itemBuilder: (context, index) {
-            return Column(
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Row(children: [
-                  Padding(
-                    padding: EdgeInsets.only(right: 20.0),
-                    child: FadeInImage.assetNetwork(
-                      placeholder: Utils.getDefaultWeatherIcon(),
-                      height: 70.0,
-                      width: 70.0,
-                      image: Utils.getWeatherIconUrl(weatherData[index].icon),
-                    ),
-                  ),
-                  Expanded(
-                      flex: 5,
-                      child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          children: <Widget>[
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(weatherData[index].cityName,
-                                  style: TextStyle(fontSize: 18)),
-                            ),
-                            Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                    Utils.formatDateTimeFormat(
-                                        weatherData[index].dt,
-                                        weatherData[index].timezone),
-                                    style: TextStyle(fontSize: 14))),
-                          ])),
-                  Expanded(
-                    flex: 2,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                          '${weatherData[index].temp} ${Utils.getTempUnit(tempUnitValue)}',
-                          style: TextStyle(fontSize: 16)),
-                    ),
-                  )
-                ]),
-                Padding(
-                    padding: EdgeInsets.only(left: 90.0),
-                    child: Container(color: Colors.black26, height: 1))
-              ],
-            );
-          },
-        ),
-      ),
+          flex: 1,
+          child: weatherData == null
+              ? SpinKitChasingDots(color: Colors.blueAccent, size: 50.0)
+              : getWidgetCitiesList())
     ]));
+  }
+
+  Widget getWidgetCitiesList() {
+    return ListView.builder(
+      itemCount: weatherData.length,
+      itemBuilder: (context, index) {
+        return Column(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Row(children: [
+              Padding(
+                padding: EdgeInsets.only(right: 20.0),
+                child: FadeInImage.assetNetwork(
+                  placeholder: getDefaultWeatherIcon(),
+                  height: 70.0,
+                  width: 70.0,
+                  image: getWeatherIconUrl(weatherData[index].icon),
+                ),
+              ),
+              Expanded(
+                  flex: 5,
+                  child:
+                      Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(weatherData[index].cityName,
+                          style: TextStyle(fontSize: 18)),
+                    ),
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                            formatDateTimeFormat(weatherData[index].dt,
+                                weatherData[index].timezone),
+                            style: TextStyle(fontSize: 14))),
+                  ])),
+              Expanded(
+                flex: 2,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                      '${weatherData[index].temp} ${getTempUnit(tempUnitValue)}',
+                      style: TextStyle(fontSize: 16)),
+                ),
+              )
+            ]),
+            Padding(
+                padding: EdgeInsets.only(left: 90.0),
+                child: Container(color: Colors.black26, height: 1))
+          ],
+        );
+      },
+    );
   }
 
   void navigateChangeCitiesList() {
@@ -111,21 +115,20 @@ class _CitiesPageState extends State<CitiesPage> {
             builder: (context) => SearchCityPage(title: 'Search city')));
   }
 
-  void changeCitiesList(List<String> value) {
+  void _changeCitiesList(List<String> value) {
     if (value != null) {
       citiesIds = value;
-      weatherData.clear();
-      RequestHelper.getCurrentWeatherByIds(setWeatherData, () => {}, citiesIds);
+      RequestHelper.getCurrentWeatherByIds(_setWeatherData, () => {}, citiesIds);
     }
   }
 
-  void setWeatherData(List<WeatherData> data) {
+  void _setWeatherData(List<WeatherData> data) {
     setState(() {
       weatherData = data;
     });
   }
 
-  void changeTempUnitValue(String value) {
+  void _changeTempUnitValue(String value) {
     setState(() {
       tempUnitValue = value;
     });

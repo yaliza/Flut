@@ -173,13 +173,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: <Widget>[
                       ListTile(
                         leading: FadeInImage.assetNetwork(
-                            placeholder: Utils.getDefaultWeatherIcon(),
+                            placeholder: getDefaultWeatherIcon(),
                             image: weatherData != null
-                                ? Utils.getWeatherIconUrl(weatherData.icon)
-                                : Utils.getWeatherIconUrl('')),
+                                ? getWeatherIconUrl(weatherData.icon)
+                                : getWeatherIconUrl('')),
                         title: Text(
                           weatherData != null
-                              ? '${weatherData.temp} ${Utils.getTempUnit(tempUnitValue)}'
+                              ? '${weatherData.temp} ${getTempUnit(tempUnitValue)}'
                               : '',
                           style: TextStyle(fontSize: 32.0),
                         ),
@@ -190,13 +190,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           Text(
                             weatherData != null
-                                ? 'Sunset: ${Utils.formatDateTimeFormat(weatherData.sunrise * 1000, weatherData.timezone)}'
+                                ? 'Sunset: ${formatDateTimeFormat(weatherData.sunrise * 1000, weatherData.timezone)}'
                                 : '',
                             style: TextStyle(fontSize: 22.0),
                           ),
                           Text(
                             weatherData != null
-                                ? 'Sunset: ${Utils.formatDateTimeFormat(weatherData.sunset * 1000, weatherData.timezone)}}'
+                                ? 'Sunset: ${formatDateTimeFormat(weatherData.sunset * 1000, weatherData.timezone)}}'
                                 : '',
                             style: TextStyle(fontSize: 22.0),
                           ),

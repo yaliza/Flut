@@ -1,11 +1,11 @@
-import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/api/request_helper.dart';
-import 'package:flutter_app/entities/weather_info_prediction.dart';
+import 'package:flutter_app/entities/weather_info_predictions.dart';
 import 'package:flutter_app/preferences_helper.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_app/utils.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class ChartsPage extends StatefulWidget {
   ChartsPage({Key key, this.title}) : super(key: key);
@@ -18,85 +18,27 @@ class ChartsPage extends StatefulWidget {
 }
 
 class _ChartsPageState extends State<ChartsPage> {
-  var weatherInfoPredictions = List<WeatherInfoPrediction>(),
-      cityValue = '',
+  var weatherInfoPredictions,
       tempUnitValue = '',
       dots = [FlSpot(0, 20.0)],
-      minX = 0.0,
-      maxX = 7.0,
-      minY = 11.0,
-      maxY = 25.0,
-      avgPressure = 0.0,
-      avgTemp = 0.0,
-      avgHumidity = 0.0,
       gradientColors = [Color(0xff23b6e6), Color(0xff02d39a)],
       showAreaBelowPlot = true,
-      showGrid = true;
+      showGrid = true,
+      marketCitiesIds;
 
   _ChartsPageState() {
-    RequestHelper.getPredictions(changeWeatherInfoList, () => print('error'));
-    PreferencesHelper.getCity().then(changeCity);
     PreferencesHelper.getTempUnit().then(changeTempUnit);
     PreferencesHelper.getFillAreaBelowPlot().then(changeShowAreaBelowPlot);
     PreferencesHelper.getShowGrid().then(changeShowGrid);
+    PreferencesHelper.getMarkedCitiesIds().then(changeMarkedCitiesIds);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        //appBar: AppBar(title: Text(widget.title)),
-        body: Column(
-          children: <Widget>[
-            Expanded(
-                flex: 1,
-                child: Column(
-                  children: <Widget>[
-                    Expanded(
-                        flex: 1,
-                        child: Align(
-                            alignment: FractionalOffset.center,
-                            child: Text(cityValue,
-                                style: TextStyle(fontSize: 22),
-                                textAlign: TextAlign.center))),
-                    Expanded(
-                      flex: 1,
-                      child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: <Widget>[
-                            getKeyValueWiget(
-                                "Avg temp", avgTemp.toStringAsFixed(2)),
-                            Container(color: Colors.black26, width: 1),
-                            getKeyValueWiget(
-                                "Avg humidity", avgHumidity.toStringAsFixed(2)),
-                            Container(color: Colors.black26, width: 1),
-                            getKeyValueWiget(
-                                "Avg pressure", avgPressure.toStringAsFixed(2))
-                          ]),
-                    )
-                  ],
-                )),
-            Expanded(
-              flex: 3,
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      height: MediaQuery.of(context).size.height,
-                      decoration: BoxDecoration(color: Color(0xff232d37)),
-                      child: Padding(
-                          padding: const EdgeInsets.only(
-                              right: 18.0, left: 12.0, top: 45, bottom: 12),
-                          child: getChartWidget()),
-                      // ),
-                    ),
-                  )
-                ],
-              ),
-            )
-          ],
-        ));
+        body: weatherInfoPredictions != null
+            ? mainContentWidget()
+            : SpinKitChasingDots(color: Colors.blueAccent, size: 50.0));
   }
 
   Widget getChartWidget() {
@@ -126,10 +68,10 @@ class _ChartsPageState extends State<ChartsPage> {
           borderData: FlBorderData(
               show: true,
               border: Border.all(color: Color(0xff37434d), width: 1)),
-          minX: minX,
-          maxX: maxX,
-          minY: minY,
-          maxY: maxY,
+          minX: 0,
+          maxX: weatherInfoPredictions.predictions.length.toDouble(),
+          minY: weatherInfoPredictions.minTemp,
+          maxY: weatherInfoPredictions.maxTemp + 1,
           lineBarsData: [
             LineChartBarData(
               spots: dots,
@@ -172,46 +114,85 @@ class _ChartsPageState extends State<ChartsPage> {
         ));
   }
 
+  Widget mainContentWidget() {
+    return Column(
+      children: <Widget>[
+        Expanded(
+            flex: 1,
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                    flex: 1,
+                    child: Align(
+                        alignment: FractionalOffset.center,
+                        child: Text(weatherInfoPredictions.cityName,
+                            style: TextStyle(fontSize: 22),
+                            textAlign: TextAlign.center))),
+                Expanded(
+                  flex: 1,
+                  child: Row(mainAxisSize: MainAxisSize.max, children: <Widget>[
+                    getKeyValueWiget("Avg temp",
+                        weatherInfoPredictions.averageTemp.toStringAsFixed(2)),
+                    Container(color: Colors.black26, width: 1),
+                    getKeyValueWiget(
+                        "Avg humidity",
+                        weatherInfoPredictions.averageHumidity
+                            .toStringAsFixed(2)),
+                    Container(color: Colors.black26, width: 1),
+                    getKeyValueWiget(
+                        "Avg pressure",
+                        weatherInfoPredictions.averagePressure
+                            .toStringAsFixed(2))
+                  ]),
+                )
+              ],
+            )),
+        Expanded(
+          flex: 3,
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Expanded(
+                flex: 1,
+                child: Container(
+                  height: MediaQuery.of(context).size.height,
+                  decoration: BoxDecoration(color: Color(0xff232d37)),
+                  child: Padding(
+                      padding: const EdgeInsets.only(
+                          right: 18.0, left: 12.0, top: 45, bottom: 12),
+                      child: getChartWidget()),
+                  // ),
+                ),
+              )
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
   String getDateLabel(double value) {
     switch (value.toInt()) {
       case 5:
-        return Utils.formatDateFullFormat(DateTime.now());
+        return formatDateFullFormat(DateTime.now());
       case 15:
-        return Utils.formatDateFullFormat(DateTime.now().add(Duration(days: 1)));
+        return formatDateFullFormat(DateTime.now().add(Duration(days: 1)));
       case 25:
-        return Utils.formatDateFullFormat(DateTime.now().add(Duration(days: 2)));
+        return formatDateFullFormat(DateTime.now().add(Duration(days: 2)));
       case 35:
-        return Utils.formatDateFullFormat(DateTime.now().add(Duration(days: 3)));
+        return formatDateFullFormat(DateTime.now().add(Duration(days: 3)));
     }
     return "";
   }
 
-  void changeWeatherInfoList(List<WeatherInfoPrediction> predictions) {
-    int i = 0;
+  void changeWeatherPredictions(WeatherInfoPredictions weatherPredictions) {
     var newDots = <FlSpot>[];
-    var newMinY = predictions[0].temp;
-    var newMaxY = predictions[0].temp;
-    var newAvgHumidity = 0.0;
-    var newAvgPressure = 0.0;
-    var newAvgTemp = 0.0;
-    predictions.forEach((pred) {
-      newDots.add(FlSpot(double.parse((i++).toString()), pred.temp));
-      newMinY = math.min(pred.temp, newMinY);
-      newMaxY = math.max(pred.temp, newMaxY);
-      newAvgHumidity += pred.humidity;
-      newAvgPressure += pred.pressure;
-      newAvgTemp += pred.temp;
+    weatherPredictions.predictions.forEach((pred) {
+      newDots.add(FlSpot(double.parse((newDots.length).toString()), pred.temp));
     });
-
     setState(() {
+      this.weatherInfoPredictions = weatherPredictions;
       dots = newDots;
-      maxX = predictions.length.toDouble() - 1;
-      minX = 0;
-      minY = newMinY;
-      maxY = newMaxY + 1.0;
-      avgTemp = newAvgTemp /= predictions.length;
-      avgPressure = newAvgPressure /= predictions.length;
-      avgHumidity = newAvgHumidity /= predictions.length;
     });
   }
 
@@ -233,9 +214,8 @@ class _ChartsPageState extends State<ChartsPage> {
     });
   }
 
-  void changeCity(String value) {
-    setState(() {
-      cityValue = value;
-    });
+  void changeMarkedCitiesIds(List<String> ids) {
+    RequestHelper.getPredictions(
+        changeWeatherPredictions, () => print('error'), ids[0]);
   }
 }

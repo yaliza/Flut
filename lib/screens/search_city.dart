@@ -3,6 +3,7 @@ import 'package:flutter_app/entities/city.dart';
 import 'package:flutter_app/api/request_helper.dart';
 import 'dart:collection';
 import 'package:flutter_app/preferences_helper.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class SearchCityPage extends StatefulWidget {
   SearchCityPage({Key key, this.title}) : super(key: key);
@@ -15,18 +16,12 @@ class SearchCityPage extends StatefulWidget {
 }
 
 class _SearchCityPageState extends State<SearchCityPage> {
-  List<City> cities = [];
+  List<City> cities;
   List<City> filteredCities = [];
   HashSet<String> markedCitiesIds;
 
   String filter = '';
   TextEditingController controller = TextEditingController();
-
-  _SearchCityPageState() {
-    RequestHelper.getCitiesList(changeCitiesList, () => {});
-    PreferencesHelper.getMarkedCitiesIds()
-        .then((list) => changeMarkedCitiesList(list));
-  }
 
   @override
   void initState() {
@@ -34,6 +29,9 @@ class _SearchCityPageState extends State<SearchCityPage> {
     controller.addListener(() {
       filter = controller.text;
     });
+    RequestHelper.getCitiesList(changeCitiesList, () => {});
+    PreferencesHelper.getMarkedCitiesIds()
+        .then((list) => changeMarkedCitiesList(list));
   }
 
   @override
@@ -45,8 +43,14 @@ class _SearchCityPageState extends State<SearchCityPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(children: <Widget>[
-      Padding(padding: EdgeInsets.only(top: 20.0)),
+        body: cities == null
+            ? SpinKitChasingDots(color: Colors.blueAccent, size: 50.0)
+            : getMainContentWidget());
+  }
+
+  Widget getMainContentWidget() {
+    return Column(children: <Widget>[
+      Padding(padding: EdgeInsets.only(top: 30.0, left: 20.0, right: 20.0)),
       TextField(
         decoration: InputDecoration(labelText: "Search city"),
         controller: controller,
@@ -65,7 +69,7 @@ class _SearchCityPageState extends State<SearchCityPage> {
                           changeMarkedCity(filteredCities[index].id, val))
                 ]));
               }))
-    ]));
+    ]);
   }
 
   void onEditingComplete() {
@@ -91,7 +95,9 @@ class _SearchCityPageState extends State<SearchCityPage> {
   }
 
   void changeCitiesList(List<City> value) {
-    cities = value;
+    setState(() {
+      cities = value;
+    });
     filterCities();
   }
 
