@@ -26,16 +26,12 @@ class RequestHelper {
     }
   }
 
-  static void getCurrentWeather(
-      Function(WeatherData) callback, Function error) async {
-    String link =
-        'https://api.openweathermap.org/data/2.5/weather?q=${await PreferencesHelper.getCity()}&units=${await PreferencesHelper.getTempUnit()}&appid=${await PreferencesHelper.getAppId()}';
-    final response = await http.get(link);
-    if (response.statusCode == 200) {
-      callback(WeatherData.fromJson(json.decode(response.body)));
-    } else {
-      error();
-    }
+  static void getCurrentWeatherNearestCities(
+      Function(List<WeatherData>) callback,
+      Function error,
+      double lat,
+      double lon) {
+
   }
 
   static void getCurrentWeatherByIds(Function(List<WeatherData>) callback,

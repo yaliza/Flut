@@ -9,7 +9,7 @@ class City {
     return City(
       id: json['id'].toString(),
       name: json['name'],
-      latitude: double.parse(json['coord']['lat']),
+      latitude: double.parse(json['coord']['lat'].toString()),
       longitude: double.parse(json['coord']['lon'].toString())
     );
   }

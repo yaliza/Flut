@@ -104,26 +104,36 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static List<String> dropdownValues = [
-    'Minsk',
-    'Brest',
-    'Moscow',
-    'Vitebsk',
-    'London',
-    'Berlin'
-  ];
+  List<String> dropdownValues;
 
-  String dropdownValue = dropdownValues[0];
-  WeatherData weatherData;
+  String currentCityValue;
+  WeatherData currentWeatherData;
+  List<WeatherData> citiesWeather;
   String tempUnitValue = '';
   List<WeatherIcon> icons;
 
   var location = new Location();
-  Map<String, double> userLocation;
-  List<String> citiesNearby;
-  List<City> cities;
-  List<City> filteredCities = [];
-  String filter = '';
+
+  _MyHomePageState() {
+    currentCityValue = '';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    PreferencesHelper.getMarkedCitiesIds().then(getMarkedCitiesListIds);
+    rootBundle
+        .loadString('assets/weather_conditions.json')
+        .then(parseWeatherIconsJson);
+  }
+
+  void getMarkedCitiesListIds(List<String> ids) {
+    if (ids != null && ids.length > 0) {
+      RequestHelper.getCurrentWeatherByIds(changeCitiesWeather, () => {}, ids);
+    } else {
+      getLocation().then(changeUserLocation);
+    }
+  }
 
   Future<Map<String, double>> getLocation() async {
     var currentLocation = <String, double>{};
@@ -135,38 +145,17 @@ class _MyHomePageState extends State<MyHomePage> {
     return currentLocation;
   }
 
-  void changeCitiesList(List<City> value) {
+  void changeCitiesWeather(List<WeatherData> weatherData) {
     setState(() {
-      cities = value;
-    });
-    filterCities();
-  }
-
-  void filterCities() async {
-    if (filter.isNotEmpty) {
-      var result = cities
-          .where(
-              (city) => city.name.toLowerCase().contains(filter.toLowerCase()))
-          .toList();
-      setState(() {
-        filteredCities = result;
-      });
-    }
-  }
-
-  void getCitiesNearby() {
-    RequestHelper.getCitiesList(changeCitiesList, () => {});
-    double userLatitude = userLocation['latitude'];
-    double userLongitude = userLocation['longitude'];
-    for (City city in filteredCities) {
-      if (sqrt(pow(userLatitude - city.latitude, 2) + pow(userLongitude - city.longitude, 2)) < 10) {
-        citiesNearby.add(city.name);
+      citiesWeather = weatherData;
+      dropdownValues =
+          weatherData.map((weatherData) => weatherData.cityName).toList();
+      if (citiesWeather != null && citiesWeather.length != 0) {
+        currentWeatherData = citiesWeather[0];
+        currentCityValue = citiesWeather[0].cityName;
       }
-    }
+    });
   }
-
-  static const IconData settingsIcon =
-      IconData(0xe8b8, fontFamily: 'MaterialIcons');
 
   void changeTempUnit(String value) {
     setState(() {
@@ -174,26 +163,16 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void changeUserLocation(Map<String, double> location) {
-    setState(() {
-      userLocation = location;
-    });
+  void changeUserLocation(Map<String, double> loc) {
+    RequestHelper.getCurrentWeatherNearestCities(
+        changeCitiesWeather, () => {}, loc['latitude'], loc['longitude']);
   }
 
   void changeWeatherData(WeatherData data) {
     PreferencesHelper.getTempUnit().then((val) => changeTempUnit(val));
     setState(() {
-      weatherData = data;
+      currentWeatherData = data;
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getLocation().then((val) => changeUserLocation(val));
-    RequestHelper.getCurrentWeather(changeWeatherData,() => print('error'));
-    rootBundle.loadString('assets/weather_conditions.json').then(parseWeatherIconsJson);
-    getCitiesNearby();
   }
 
   void parseWeatherIconsJson(String data) {
@@ -204,9 +183,14 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  _MyHomePageState() {
-    RequestHelper.getCurrentWeather(
-        (data) => changeWeatherData(data), () => print('error'));
+  void changeDropdownValue(String newValue) {
+    setState(() {
+      if (newValue.isNotEmpty) {
+        currentCityValue = newValue;
+        currentWeatherData = citiesWeather
+            .firstWhere((weather) => weather.cityName == currentCityValue);
+      }
+    });
   }
 
   @override
@@ -227,27 +211,24 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             child: ListView(
               children: <Widget>[
-                Center(
-                  child: DropdownButton<String>(
-                    value: dropdownValue,
-                    onChanged: (String newValue) {
-                      setState(() {
-                        dropdownValue = newValue;
-                        PreferencesHelper.setCity(dropdownValue);
-                        RequestHelper.getCurrentWeather(
-                            (data) => changeWeatherData(data),
-                            () => print('error'));
-                      });
-                    },
-                    items: dropdownValues
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value, style: TextStyle(fontSize: 22.0)),
-                      );
-                    }).toList(),
-                  ),
-                ),
+                dropdownValues != null && dropdownValues.length > 0
+                    ? Center(
+                        child: dropdownValues.length > 1
+                            ? DropdownButton<String>(
+                                value: currentCityValue,
+                                onChanged: changeDropdownValue,
+                                items: dropdownValues
+                                    .map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value,
+                                        style: TextStyle(fontSize: 22.0)),
+                                  );
+                                }).toList(),
+                              )
+                            : Text(dropdownValues[0]))
+                    : Text('No cities to present. Please add them in settings.'),
                 Card(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -255,29 +236,31 @@ class _MyHomePageState extends State<MyHomePage> {
                       ListTile(
                         leading: FadeInImage.assetNetwork(
                             placeholder: getDefaultWeatherIcon(),
-                            image: weatherData != null
-                                ? getWeatherIconUrl(weatherData.icon)
+                            image: currentWeatherData != null
+                                ? getWeatherIconUrl(currentWeatherData.icon)
                                 : getWeatherIconUrl('')),
                         title: Text(
-                          weatherData != null
-                              ? '${weatherData.temp} ${getTempUnit(tempUnitValue)}'
+                          currentWeatherData != null
+                              ? '${currentWeatherData.temp} ${getTempUnit(tempUnitValue)}'
                               : '',
                           style: TextStyle(fontSize: 32.0),
                         ),
                         subtitle: Column(children: <Widget>[
                           Text(
-                            weatherData != null ? weatherData.description : '',
-                            style: TextStyle(fontSize: 22.0),
-                          ),
-                          Text(
-                            weatherData != null
-                                ? 'Sunrise: ${formatDateTimeFormat(weatherData.sunrise * 1000, weatherData.timezone)}'
+                            currentWeatherData != null
+                                ? currentWeatherData.description
                                 : '',
                             style: TextStyle(fontSize: 22.0),
                           ),
                           Text(
-                            weatherData != null
-                                ? 'Sunset: ${formatDateTimeFormat(weatherData.sunset * 1000, weatherData.timezone)}'
+                            currentWeatherData != null
+                                ? 'Sunrise: ${formatDateTimeFormat(currentWeatherData.sunrise * 1000, currentWeatherData.timezone)}'
+                                : '',
+                            style: TextStyle(fontSize: 22.0),
+                          ),
+                          Text(
+                            currentWeatherData != null
+                                ? 'Sunset: ${formatDateTimeFormat(currentWeatherData.sunset * 1000, currentWeatherData.timezone)}'
                                 : '',
                             style: TextStyle(fontSize: 22.0),
                           ),
