@@ -6,6 +6,11 @@ import 'package:flutter_app/screens/preferences.dart';
 
 import 'api/request_helper.dart';
 import 'entities/weather_data.dart';
+import 'screens/preferences.dart';
+import 'screens/charts.dart';
+import 'entities/weather_icon.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'dart:convert';
 import 'utils.dart';
 
 void main() => runApp(MyApp());
@@ -107,6 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String dropdownValue = dropdownValues[0];
   WeatherData weatherData;
   String tempUnitValue = '';
+  List<WeatherIcon> icons;
 
   static const IconData settingsIcon =
       IconData(0xe8b8, fontFamily: 'MaterialIcons');
@@ -121,6 +127,21 @@ class _MyHomePageState extends State<MyHomePage> {
     PreferencesHelper.getTempUnit().then((val) => changeTempUnit(val));
     setState(() {
       weatherData = data;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    RequestHelper.getCurrentWeather(changeWeatherData,() => print('error'));
+    rootBundle.loadString('assets/weather_conditions.json').then(parseWeatherIconsJson);
+  }
+
+  void parseWeatherIconsJson(String data) {
+    setState(() {
+      icons = (json.decode(data) as List)
+          .map((js) => WeatherIcon.fromJson(js))
+          .toList();
     });
   }
 
