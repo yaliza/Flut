@@ -6,9 +6,7 @@ import 'package:flutter_app/screens/charts.dart';
 import 'package:flutter_app/screens/cities.dart';
 import 'package:flutter_app/screens/preferences.dart';
 import 'package:location/location.dart';
-
 import 'api/request_helper.dart';
-import 'entities/city.dart';
 import 'entities/weather_data.dart';
 import 'screens/preferences.dart';
 import 'screens/charts.dart';
@@ -111,6 +109,33 @@ class _MyHomePageState extends State<MyHomePage> {
   List<WeatherData> citiesWeather;
   String tempUnitValue = '';
   List<WeatherIcon> icons;
+  String iconUrl = '';
+
+  List<String> weatherConditionsMainDescription = ['thunderstorm', 'drizzle', 'snow'];
+
+  void getIconUrl() {
+    for (WeatherIcon icon in icons) {
+      if (weatherConditionsMainDescription.contains(icon.description)) {
+        if (icon.description == currentWeatherData.mainDescription) {
+          if (new DateTime.now().hour > 6 && new DateTime.now().hour < 20) {
+            iconUrl = icon.day;
+          } else {
+            iconUrl = icon.night;
+          }
+          break;
+        }
+      }
+      if (icon.description == currentWeatherData.description) {
+        if (new DateTime.now().hour > 6 && new DateTime.now().hour < 20) {
+          iconUrl = icon.day;
+        } else {
+          iconUrl = icon.night;
+        }
+        break;
+      }
+    }
+    print('url is $iconUrl');
+  }
 
   var location = new Location();
 
@@ -153,6 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (citiesWeather != null && citiesWeather.length != 0) {
         currentWeatherData = citiesWeather[0];
         currentCityValue = citiesWeather[0].cityName;
+        getIconUrl();
       }
     });
   }
@@ -168,12 +194,6 @@ class _MyHomePageState extends State<MyHomePage> {
         changeCitiesWeather, () => {}, loc['latitude'], loc['longitude']);
   }
 
-  void changeWeatherData(WeatherData data) {
-    PreferencesHelper.getTempUnit().then((val) => changeTempUnit(val));
-    setState(() {
-      currentWeatherData = data;
-    });
-  }
 
   void parseWeatherIconsJson(String data) {
     setState(() {
@@ -236,9 +256,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ListTile(
                         leading: FadeInImage.assetNetwork(
                             placeholder: getDefaultWeatherIcon(),
-                            image: currentWeatherData != null
-                                ? getWeatherIconUrl(currentWeatherData.icon)
-                                : getWeatherIconUrl('')),
+                            image: iconUrl),
                         title: Text(
                           currentWeatherData != null
                               ? '${currentWeatherData.temp} ${getTempUnit(tempUnitValue)}'
