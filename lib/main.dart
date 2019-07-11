@@ -1,12 +1,19 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/screens/charts.dart';
 import 'package:flutter_app/screens/cities.dart';
 import 'package:flutter_app/screens/preferences.dart';
 import 'package:flutter_app/weather_forecast.dart';
-
+import 'package:location/location.dart';
 import 'api/request_helper.dart';
 import 'entities/weather_data.dart';
+import 'screens/preferences.dart';
+import 'screens/charts.dart';
+import 'entities/weather_icon.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'dart:convert';
 import 'utils.dart';
 
 void main() => runApp(MyApp());
@@ -43,8 +50,7 @@ class _HomeState extends State<Home> {
   final List<Widget> _children = [
     MyHomePage(title: 'Home'),
     PreferencesPage(title: 'Preferences'),
-    WeatherForecast(),
-    //ChartsPage(title: 'Charts'),
+    ChartsPage(title: 'Charts'),
     CitiesPage(title: 'Cities')
   ];
 
@@ -97,21 +103,86 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static List<String> dropdownValues = [
-    'Minsk',
-    'Brest',
-    'Moscow',
-    'Vitebsk',
-    'London',
-    'Berlin'
-  ];
+  List<String> dropdownValues;
 
-  String dropdownValue = dropdownValues[0];
-  WeatherData weatherData;
+  String currentCityValue;
+  WeatherData currentWeatherData;
+  List<WeatherData> citiesWeather;
   String tempUnitValue = '';
+  List<WeatherIcon> icons;
+  String iconUrl = '';
 
-  static const IconData settingsIcon =
-      IconData(0xe8b8, fontFamily: 'MaterialIcons');
+  List<String> weatherConditionsMainDescription = ['thunderstorm', 'drizzle', 'snow'];
+
+  void getIconUrl() {
+    for (WeatherIcon icon in icons) {
+      if (weatherConditionsMainDescription.contains(icon.description)) {
+        if (icon.description == currentWeatherData.mainDescription) {
+          if (new DateTime.now().hour > 6 && new DateTime.now().hour < 20) {
+            iconUrl = icon.day;
+          } else {
+            iconUrl = icon.night;
+          }
+          break;
+        }
+      }
+      if (icon.description == currentWeatherData.description) {
+        if (new DateTime.now().hour > 6 && new DateTime.now().hour < 20) {
+          iconUrl = icon.day;
+        } else {
+          iconUrl = icon.night;
+        }
+        break;
+      }
+    }
+    print('url is $iconUrl');
+  }
+
+  var location = new Location();
+
+  _MyHomePageState() {
+    currentCityValue = '';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    PreferencesHelper.getMarkedCitiesIds().then(getMarkedCitiesListIds);
+    rootBundle
+        .loadString('assets/weather_conditions.json')
+        .then(parseWeatherIconsJson);
+  }
+
+  void getMarkedCitiesListIds(List<String> ids) {
+    if (ids != null && ids.length > 0) {
+      RequestHelper.getCurrentWeatherByIds(changeCitiesWeather, () => {}, ids);
+    } else {
+      getLocation().then(changeUserLocation);
+    }
+  }
+
+  Future<Map<String, double>> getLocation() async {
+    var currentLocation = <String, double>{};
+    try {
+      currentLocation = await location.getLocation();
+    } catch (e) {
+      currentLocation = null;
+    }
+    return currentLocation;
+  }
+
+  void changeCitiesWeather(List<WeatherData> weatherData) {
+    setState(() {
+      citiesWeather = weatherData;
+      dropdownValues =
+          weatherData.map((weatherData) => weatherData.cityName).toList();
+      if (citiesWeather != null && citiesWeather.length != 0) {
+        currentWeatherData = citiesWeather[0];
+        currentCityValue = citiesWeather[0].cityName;
+        getIconUrl();
+      }
+    });
+  }
 
   void changeTempUnit(String value) {
     setState(() {
@@ -119,16 +190,28 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void changeWeatherData(WeatherData data) {
-    PreferencesHelper.getTempUnit().then((val) => changeTempUnit(val));
+  void changeUserLocation(Map<String, double> loc) {
+    RequestHelper.getCurrentWeatherNearestCities(
+        changeCitiesWeather, () => {}, loc['latitude'], loc['longitude']);
+  }
+
+
+  void parseWeatherIconsJson(String data) {
     setState(() {
-      weatherData = data;
+      icons = (json.decode(data) as List)
+          .map((js) => WeatherIcon.fromJson(js))
+          .toList();
     });
   }
 
-  _MyHomePageState() {
-    RequestHelper.getCurrentWeather(
-        (data) => changeWeatherData(data), () => print('error'));
+  void changeDropdownValue(String newValue) {
+    setState(() {
+      if (newValue.isNotEmpty) {
+        currentCityValue = newValue;
+        currentWeatherData = citiesWeather
+            .firstWhere((weather) => weather.cityName == currentCityValue);
+      }
+    });
   }
 
   @override
@@ -149,27 +232,24 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             child: ListView(
               children: <Widget>[
-                Center(
-                  child: DropdownButton<String>(
-                    value: dropdownValue,
-                    onChanged: (String newValue) {
-                      setState(() {
-                        dropdownValue = newValue;
-                        PreferencesHelper.setCity(dropdownValue);
-                        RequestHelper.getCurrentWeather(
-                            (data) => changeWeatherData(data),
-                            () => print('error'));
-                      });
-                    },
-                    items: dropdownValues
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value, style: TextStyle(fontSize: 22.0)),
-                      );
-                    }).toList(),
-                  ),
-                ),
+                dropdownValues != null && dropdownValues.length > 0
+                    ? Center(
+                        child: dropdownValues.length > 1
+                            ? DropdownButton<String>(
+                                value: currentCityValue,
+                                onChanged: changeDropdownValue,
+                                items: dropdownValues
+                                    .map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value,
+                                        style: TextStyle(fontSize: 22.0)),
+                                  );
+                                }).toList(),
+                              )
+                            : Text(dropdownValues[0]))
+                    : Text('No cities to present. Please add them in settings.'),
                 Card(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -177,29 +257,29 @@ class _MyHomePageState extends State<MyHomePage> {
                       ListTile(
                         leading: FadeInImage.assetNetwork(
                             placeholder: getDefaultWeatherIcon(),
-                            image: weatherData != null
-                                ? getWeatherIconUrl(weatherData.icon)
-                                : getWeatherIconUrl('')),
+                            image: iconUrl),
                         title: Text(
-                          weatherData != null
-                              ? '${weatherData.temp} ${getTempUnit(tempUnitValue)}'
+                          currentWeatherData != null
+                              ? '${currentWeatherData.temp} ${getTempUnit(tempUnitValue)}'
                               : '',
                           style: TextStyle(fontSize: 32.0),
                         ),
                         subtitle: Column(children: <Widget>[
                           Text(
-                            weatherData != null ? weatherData.description : '',
-                            style: TextStyle(fontSize: 22.0),
-                          ),
-                          Text(
-                            weatherData != null
-                                ? 'Sunrise: ${formatDateTimeFormat(weatherData.sunrise * 1000, weatherData.timezone)}'
+                            currentWeatherData != null
+                                ? currentWeatherData.description
                                 : '',
                             style: TextStyle(fontSize: 22.0),
                           ),
                           Text(
-                            weatherData != null
-                                ? 'Sunset: ${formatDateTimeFormat(weatherData.sunset * 1000, weatherData.timezone)}'
+                            currentWeatherData != null
+                                ? 'Sunrise: ${formatDateTimeFormat(currentWeatherData.sunrise * 1000, currentWeatherData.timezone)}'
+                                : '',
+                            style: TextStyle(fontSize: 22.0),
+                          ),
+                          Text(
+                            currentWeatherData != null
+                                ? 'Sunset: ${formatDateTimeFormat(currentWeatherData.sunset * 1000, currentWeatherData.timezone)}'
                                 : '',
                             style: TextStyle(fontSize: 22.0),
                           ),
@@ -208,8 +288,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                   ),
                 ),
-                SingleChildScrollView(scrollDirection: Axis.vertical,
-                  child : WeatherForecast())
+                /*SingleChildScrollView(scrollDirection: Axis.vertical,
+                  child : WeatherForecast())*/
               ],
             )));
   }

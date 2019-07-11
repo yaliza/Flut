@@ -180,7 +180,7 @@ class DayWeatherData {
   String date;
   double temp;
   String icon;
-  
+
   DayWeatherData(String date, double temp, String icon) {
     this.date = date;
     this.temp = temp;
