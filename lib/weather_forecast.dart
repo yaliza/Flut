@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/screens/preferences.dart';
+import 'package:flutter_app/utils.dart';
 import 'package:http/http.dart' as http;
 
 import 'api/request_helper.dart';
@@ -22,16 +23,16 @@ class _WeatherForecastState extends State<WeatherForecast> {
 
   _WeatherForecastState() {
     PreferencesHelper.getCityId().then((val) => changeCityId(val));
-    RequestHelper.getPredictions(
-            (data) => changeWeatherData(data),
-            () => print('error'),
-            cityId
-    );
   }
 
   void changeCityId(String cityId) {
     setState(() {
       this.cityId = cityId;
+      RequestHelper.getPredictions(
+              (data) => changeWeatherData(data),
+              () => print('error'),
+          cityId
+      );
     });
   }
 
@@ -76,17 +77,26 @@ class _WeatherForecastState extends State<WeatherForecast> {
     if(predictions != null) {
       for (var i = 0; i < 8; i++) {
         List<Widget> contents = new List<Widget>();
-        contents.add(new Text(getWeekDay(predictions.predictions[i].dateTime.weekday)));
+        int hour = predictions.predictions[i].dateTime.hour;
+        String time;
+        if(hour >= 12 )
+          time = (hour - 12).toString() + " pm";
+        else
+          time = hour.toString() + " am";
+        contents.add(new Text(time));
+        contents.add(new FadeInImage.assetNetwork(
+            placeholder: getDefaultWeatherIcon(),
+            image: predictions.predictions[i] != null
+                ? getWeatherIconUrl(predictions.predictions[i].icon)
+                : getWeatherIconUrl('')));
         contents.add(new Text(predictions.predictions[i].tempmax.toString()));
-        contents.add(new Text(predictions.predictions[i].tempmin.toString()));
         list.add(new Column(children: contents));
       }
     }
     return new Row(children: list);
   }
 
-  Column dailyPredictions()
-  {
+  Column dailyPredictions() {
     List<Widget> list = new List<Widget>();
 
     if(predictions != null) {

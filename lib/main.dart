@@ -3,6 +3,7 @@ import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/screens/charts.dart';
 import 'package:flutter_app/screens/cities.dart';
 import 'package:flutter_app/screens/preferences.dart';
+import 'package:flutter_app/weather_forecast.dart';
 
 import 'api/request_helper.dart';
 import 'entities/weather_data.dart';
@@ -42,7 +43,8 @@ class _HomeState extends State<Home> {
   final List<Widget> _children = [
     MyHomePage(title: 'Home'),
     PreferencesPage(title: 'Preferences'),
-    ChartsPage(title: 'Charts'),
+    WeatherForecast(),
+    //ChartsPage(title: 'Charts'),
     CitiesPage(title: 'Cities')
   ];
 
@@ -206,6 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                   ),
                 ),
+                WeatherForecast()
               ],
             )));
   }

@@ -49,6 +49,7 @@ class WeatherInfoPrediction {
   double tempmax;
   double pressure;
   int humidity;
+  String icon;
 
   WeatherInfoPrediction(
       {this.dateTime,
@@ -56,7 +57,8 @@ class WeatherInfoPrediction {
       this.tempmin,
       this.tempmax,
       this.pressure,
-      this.humidity});
+      this.humidity,
+      this.icon});
 
   String toString() {
     return temp.toString();
@@ -69,6 +71,7 @@ class WeatherInfoPrediction {
         tempmin: double.parse((json['main']['temp_min']).toString()),
         tempmax: double.parse(json['main']['temp_max'].toString()),
         pressure: double.parse(json['main']['pressure'].toString()),
-        humidity: json['main']['humidity']);
+        humidity: json['main']['humidity'],
+        icon: json['weather'][0]['icon']);
   }
 }
