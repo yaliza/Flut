@@ -85,6 +85,7 @@ class _WeatherForecastState extends State<WeatherForecast> {
           time = hour.toString() + " am";
         contents.add(new Text(time));
         contents.add(new FadeInImage.assetNetwork(
+            height: 60,
             placeholder: getDefaultWeatherIcon(),
             image: predictions.predictions[i] != null
                 ? getWeatherIconUrl(predictions.predictions[i].icon)
@@ -100,9 +101,15 @@ class _WeatherForecastState extends State<WeatherForecast> {
     List<Widget> list = new List<Widget>();
 
     if(predictions != null) {
-      for (var i = 0; i < predictions.predictions.length; i++) {
+      for (var i = 0; i < predictions.predictions.length; i += 8) {
         List<Widget> contents = new List<Widget>();
         contents.add(new Text(getWeekDay(predictions.predictions[i].dateTime.weekday)));
+        contents.add(new FadeInImage.assetNetwork(
+            height: 100,
+            placeholder: getDefaultWeatherIcon(),
+            image: predictions.predictions[i] != null
+                ? getWeatherIconUrl(predictions.predictions[i].icon)
+                : getWeatherIconUrl('')));
         contents.add(new Text(predictions.predictions[i].tempmax.toString()));
         contents.add(new Text(predictions.predictions[i].tempmin.toString()));
         list.add(new Row(children: contents));
