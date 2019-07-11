@@ -288,9 +288,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                   ),
                 ),
-                /*SingleChildScrollView(scrollDirection: Axis.vertical,
-                  child : WeatherForecast())*/
-              ],
-            )));
+    ]) ), bottomSheet: WeatherForecast(),);
   }
 }
