@@ -3,12 +3,12 @@ import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/weather_forecast.dart';
 import 'package:intl/intl.dart';
 import 'api/request_helper.dart';
-import 'entities/icons.dart';
 import 'entities/weather_data.dart';
 import 'preferences.dart';
 import 'charts.dart';
-
+import 'entities/weather_icon.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'dart:convert';
 
 void main() => runApp(MyApp());
 
@@ -50,6 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String sunriseText = '';
   String sunsetText = '';
   String tempUnitValue = '';
+  List<WeatherIcon> icons;
 
   static const IconData settingsIcon =
       IconData(0xe8b8, fontFamily: 'MaterialIcons');
@@ -86,20 +87,17 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void changeIconsValue(List<WeatherIcon> value) {
-    setState(() {
-      PreferencesHelper.icons = (value as List).map((js) => WeatherIcon.fromJson(js)).toList();
-    });
+  @override
+  void initState() {
+    super.initState();
+    RequestHelper.getCurrentWeather(changeWeatherData,() => print('error'));
+    rootBundle.loadString('assets/weather_conditions.json').then(parseWeatherIconsJson);
   }
 
-  _MyHomePageState() {
-    RequestHelper.getCurrentWeather(
-            (data) => changeWeatherData(data),
-            () => print('error'));
-    PreferencesHelper.getIcons(
-            (json) => changeIconsValue(json),
-            () => print('error')
-    );
+  void parseWeatherIconsJson(String data){
+    setState(() {
+      icons = (json.decode(data) as List).map((js) => WeatherIcon.fromJson(js)).toList();
+    });
   }
 
   @override
@@ -178,8 +176,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       ListTile(
                         leading: FadeInImage.assetNetwork(
                             placeholder: 'place_holder.jpg',
-                            image: ''
-//                            PreferencesHelper.icons[0].day,
+                            image: 'http://openweathermap.org/img/wn/' +
+                                icon +
+                                '@2x.png',
                         ),
                         title: Text(
                           temperature ?? '',
