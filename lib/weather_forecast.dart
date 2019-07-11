@@ -75,7 +75,7 @@ class _WeatherForecastState extends State<WeatherForecast> {
     List<Widget> list = new List<Widget>();
 
     if(predictions != null) {
-      for (var i = 0; i < 8; i++) {
+      for (var i = 0; i < 6; i++) {
         List<Widget> contents = new List<Widget>();
         int hour = predictions.predictions[i].dateTime.hour;
         String time;
@@ -90,7 +90,10 @@ class _WeatherForecastState extends State<WeatherForecast> {
             image: predictions.predictions[i] != null
                 ? getWeatherIconUrl(predictions.predictions[i].icon)
                 : getWeatherIconUrl('')));
-        contents.add(new Text(predictions.predictions[i].tempmax.toString()));
+        contents.add(new Text(
+            predictions.predictions[i].tempmax.toString(),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black26),
+        ));
         list.add(new Column(children: contents));
       }
     }
@@ -103,15 +106,18 @@ class _WeatherForecastState extends State<WeatherForecast> {
     if(predictions != null) {
       for (var i = 0; i < predictions.predictions.length; i += 8) {
         List<Widget> contents = new List<Widget>();
-        contents.add(new Text(getWeekDay(predictions.predictions[i].dateTime.weekday)));
+        contents.add(new Text("   " + getWeekDay(predictions.predictions[i].dateTime.weekday),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 17),));
         contents.add(new FadeInImage.assetNetwork(
             height: 100,
             placeholder: getDefaultWeatherIcon(),
             image: predictions.predictions[i] != null
                 ? getWeatherIconUrl(predictions.predictions[i].icon)
                 : getWeatherIconUrl('')));
-        contents.add(new Text(predictions.predictions[i].tempmax.toString()));
-        contents.add(new Text(predictions.predictions[i].tempmin.toString()));
+        contents.add(new Text(predictions.predictions[i].tempmax.toString() + "   ",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black26),));
+        contents.add(new Text(predictions.predictions[i].tempmin.toString(),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),));
         list.add(new Row(children: contents));
       }
     }
