@@ -5,7 +5,7 @@ import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/screens/charts.dart';
 import 'package:flutter_app/screens/cities.dart';
 import 'package:flutter_app/screens/preferences.dart';
-import 'package:flutter_app/weather_forecast.dart';
+import 'package:flutter_app/screens/weather_forecast.dart';
 import 'package:location/location.dart';
 import 'api/request_helper.dart';
 import 'entities/weather_data.dart';

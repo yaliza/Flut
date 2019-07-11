@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_app/api/request_helper.dart';
+import 'package:flutter_app/entities/weather_info_predictions.dart';
 import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/utils.dart';
-
-import 'api/request_helper.dart';
-import 'entities/weather_info_predictions.dart';
 
 class WeatherForecast extends StatefulWidget{
   @override
