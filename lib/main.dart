@@ -287,7 +287,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       )
                     ],
                   ),
-                ),
-    ]) ), bottomSheet: WeatherForecast(),);
+                ), Container(child: WeatherForecast(), height: 300, width: 100,)
+    ]) ), /*bottomSheet: WeatherForecast(),*/);
   }
 }
