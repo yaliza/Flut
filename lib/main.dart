@@ -134,7 +134,6 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       }
     }
-    print('url is $iconUrl');
   }
 
   var location = new Location();
@@ -150,6 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
     rootBundle
         .loadString('assets/weather_conditions.json')
         .then(parseWeatherIconsJson);
+    PreferencesHelper.getTempUnit().then(changeTempUnit);
   }
 
   void getMarkedCitiesListIds(List<String> ids) {
@@ -186,6 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void changeTempUnit(String value) {
     setState(() {
       tempUnitValue = value;
+      print('temp unit is $value');
     });
   }
 
@@ -271,13 +272,13 @@ class _MyHomePageState extends State<MyHomePage> {
                             style: TextStyle(fontSize: 22.0),
                           ),
                           Text(
-                            currentWeatherData != null
+                            currentWeatherData != null && currentWeatherData.sunrise != null
                                 ? 'Sunrise: ${formatDateTimeFormat(currentWeatherData.sunrise * 1000, currentWeatherData.timezone)}'
                                 : '',
                             style: TextStyle(fontSize: 22.0),
                           ),
                           Text(
-                            currentWeatherData != null
+                            currentWeatherData != null && currentWeatherData.sunset != null
                                 ? 'Sunset: ${formatDateTimeFormat(currentWeatherData.sunset * 1000, currentWeatherData.timezone)}'
                                 : '',
                             style: TextStyle(fontSize: 22.0),

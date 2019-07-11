@@ -30,8 +30,15 @@ class RequestHelper {
       Function(List<WeatherData>) callback,
       Function error,
       double lat,
-      double lon) {
-
+      double lon) async {
+    String link =
+        'http://api.openweathermap.org/data/2.5/find?lat=${lat}&lon=${lon}&cnt=10&&appid=${await PreferencesHelper.getAppId()}&units=${await PreferencesHelper.getTempUnit()}';
+    final response = await http.get(link);
+    if (response.statusCode == 200) {
+      _parseJson(ParserWorkType.WEATHER_BY_IDS, response.body, callback);
+    } else {
+      error();
+    }
   }
 
   static void getCurrentWeatherByIds(Function(List<WeatherData>) callback,
