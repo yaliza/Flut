@@ -21,10 +21,10 @@ class _PreferencesPageState extends State<PreferencesPage> {
   @override
   void initState() {
     super.initState();
-    PreferencesHelper.getAppId().then(changeAppId);
-    PreferencesHelper.getTempUnit().then(changeTempUnit);
-    PreferencesHelper.getFillAreaBelowPlot().then(changeFillBelowPlotArea);
-    PreferencesHelper.getShowGrid().then(changeShowGrid);
+    PreferencesHelper.getAppId().then(_changeAppId);
+    PreferencesHelper.getTempUnit().then(_changeTempUnit);
+    PreferencesHelper.getFillAreaBelowPlot().then(_changeFillBelowPlotArea);
+    PreferencesHelper.getShowGrid().then(_changeShowGrid);
     appIdTextController.addListener(_onAppIdChanged);
   }
 
@@ -64,7 +64,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
           Expanded(child: Text('Fill area below plot: '), flex: 3),
           Expanded(
               child: Checkbox(
-                  value: fillAreaBelow, onChanged: changeFillBelowPlotArea),
+                  value: fillAreaBelow, onChanged: _changeFillBelowPlotArea),
               flex: 1)
         ],
       ),
@@ -72,7 +72,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
         children: [
           Expanded(child: Text('Show grid: '), flex: 3),
           Expanded(
-              child: Checkbox(value: showGrid, onChanged: changeShowGrid),
+              child: Checkbox(value: showGrid, onChanged: _changeShowGrid),
               flex: 1)
         ],
       )
@@ -84,24 +84,24 @@ class _PreferencesPageState extends State<PreferencesPage> {
         child: Text(title, style: TextStyle(fontSize: 15)),
       );
 
-  void changeTempUnit(String value) {
+  void _changeTempUnit(String value) {
     setState(() {
       tempUnitValue = value;
     });
   }
 
-  void changeAppId(String value) {
+  void _changeAppId(String value) {
     appIdTextController.text = value;
   }
 
-  void changeFillBelowPlotArea(bool value) {
+  void _changeFillBelowPlotArea(bool value) {
     PreferencesHelper.setFillAreBelowPlot(value);
     setState(() {
       fillAreaBelow = value;
     });
   }
 
-  void changeShowGrid(bool value) {
+  void _changeShowGrid(bool value) {
     PreferencesHelper.setShowGrid(value);
     setState(() {
       showGrid = value;
@@ -113,7 +113,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
   }
 
   void _onTempUnitChanged(String value) {
-    changeTempUnit(value);
+    _changeTempUnit(value);
     PreferencesHelper.setTempUnit(value);
   }
 }

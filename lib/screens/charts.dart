@@ -27,10 +27,10 @@ class _ChartsPageState extends State<ChartsPage> {
       marketCitiesIds;
 
   _ChartsPageState() {
-    PreferencesHelper.getTempUnit().then(changeTempUnit);
-    PreferencesHelper.getFillAreaBelowPlot().then(changeShowAreaBelowPlot);
-    PreferencesHelper.getShowGrid().then(changeShowGrid);
-    PreferencesHelper.getMarkedCitiesIds().then(changeMarkedCitiesIds);
+    PreferencesHelper.getTempUnit().then(_changeTempUnit);
+    PreferencesHelper.getFillAreaBelowPlot().then(_changeShowAreaBelowPlot);
+    PreferencesHelper.getShowGrid().then(_changeShowGrid);
+    PreferencesHelper.getMarkedCitiesIds().then(_changeMarkedCitiesIds);
   }
 
   @override
@@ -187,7 +187,7 @@ class _ChartsPageState extends State<ChartsPage> {
     return "";
   }
 
-  void changeWeatherPredictions(WeatherInfoPredictions weatherPredictions) {
+  void _changeWeatherPredictions(WeatherInfoPredictions weatherPredictions) {
     var newDots = <FlSpot>[];
     weatherPredictions.predictions.forEach((pred) {
       newDots.add(FlSpot(double.parse((newDots.length).toString()), pred.temp));
@@ -198,31 +198,31 @@ class _ChartsPageState extends State<ChartsPage> {
     });
   }
 
-  void changeTempUnit(String value) {
+  void _changeTempUnit(String value) {
     setState(() {
       tempUnitValue = value;
     });
   }
 
-  void changeShowAreaBelowPlot(bool value) {
+  void _changeShowAreaBelowPlot(bool value) {
     setState(() {
       showAreaBelowPlot = value;
     });
   }
 
-  void changeShowGrid(bool value) {
+  void _changeShowGrid(bool value) {
     setState(() {
       showGrid = value;
     });
   }
 
-  void changeMarkedCitiesIds(List<String> ids) {
+  void _changeMarkedCitiesIds(List<String> ids) {
     setState(() {
       this.marketCitiesIds = ids;
     });
     if (ids.length != 0) {
       RequestHelper.getPredictions(
-          changeWeatherPredictions, () => print('error'), ids[0]);
+          _changeWeatherPredictions, () => print('error'), ids[0]);
     }
   }
 }

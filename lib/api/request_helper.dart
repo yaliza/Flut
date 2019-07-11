@@ -1,13 +1,14 @@
-import 'dart:isolate';
-import 'package:flutter_app/entities/weather_data.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_app/preferences_helper.dart';
-import 'package:flutter_app/entities/weather_info_predictions.dart';
-import 'dart:convert';
-import 'package:flutter_app/entities/city.dart';
-import 'parser.dart';
 import 'dart:io';
+import 'dart:isolate';
+
+import 'package:flutter_app/entities/city.dart';
+import 'package:flutter_app/entities/weather_data.dart';
+import 'package:flutter_app/entities/weather_info_predictions.dart';
+import 'package:flutter_app/preferences_helper.dart';
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+
+import 'parser.dart';
 
 class RequestHelper {
   static Parser _parser;
@@ -30,8 +31,15 @@ class RequestHelper {
       Function(List<WeatherData>) callback,
       Function error,
       double lat,
-      double lon) {
-
+      double lon) async {
+    String link =
+        'http://api.openweathermap.org/data/2.5/find?lat=${lat}&lon=${lon}&cnt=10&&appid=${await PreferencesHelper.getAppId()}&units=${await PreferencesHelper.getTempUnit()}';
+    final response = await http.get(link);
+    if (response.statusCode == 200) {
+      _parseJson(ParserWorkType.WEATHER_BY_IDS, response.body, callback);
+    } else {
+      error();
+    }
   }
 
   static void getCurrentWeatherByIds(Function(List<WeatherData>) callback,
