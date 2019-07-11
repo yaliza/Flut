@@ -62,7 +62,7 @@ class PreferencesHelper {
   }
 
   static Future<List<String>> getMarkedCitiesIds() async {
-    return getStringList(_citiesKey);
+    return getStringList(_citiesKey, []);
   }
 
   static Future<bool> setMarkedCitiesIds(List<String> list) async {
@@ -97,9 +97,9 @@ class PreferencesHelper {
     return prefs.setBool(key, value);
   }
 
-  static Future<List<String>> getStringList(String key) async {
+  static Future<List<String>> getStringList(String key, List<String> def) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getStringList(key);
+    return prefs.getStringList(key) ?? def;
   }
 
   static Future<bool> setStringList(String key, List<String> val) async {

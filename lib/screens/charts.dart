@@ -36,9 +36,11 @@ class _ChartsPageState extends State<ChartsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: weatherInfoPredictions != null
-            ? mainContentWidget()
-            : SpinKitChasingDots(color: Colors.blueAccent, size: 50.0));
+        body: marketCitiesIds != null && marketCitiesIds.length == 0
+            ? Center(child: Text('No data to display. Please, add cities.'))
+            : weatherInfoPredictions != null
+                ? mainContentWidget()
+                : SpinKitChasingDots(color: Colors.blueAccent, size: 50.0));
   }
 
   Widget getChartWidget() {
@@ -215,7 +217,12 @@ class _ChartsPageState extends State<ChartsPage> {
   }
 
   void changeMarkedCitiesIds(List<String> ids) {
-    RequestHelper.getPredictions(
-        changeWeatherPredictions, () => print('error'), ids[0]);
+    setState(() {
+      this.marketCitiesIds = ids;
+    });
+    if (ids.length != 0) {
+      RequestHelper.getPredictions(
+          changeWeatherPredictions, () => print('error'), ids[0]);
+    }
   }
 }

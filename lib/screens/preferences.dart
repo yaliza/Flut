@@ -18,16 +18,13 @@ class _PreferencesPageState extends State<PreferencesPage> {
       showGrid = true,
       appIdTextController = TextEditingController();
 
-  _PreferencesPageState() {
+  @override
+  void initState() {
+    super.initState();
     PreferencesHelper.getAppId().then(changeAppId);
     PreferencesHelper.getTempUnit().then(changeTempUnit);
     PreferencesHelper.getFillAreaBelowPlot().then(changeFillBelowPlotArea);
     PreferencesHelper.getShowGrid().then(changeShowGrid);
-  }
-
-  @override
-  void initState() {
-    super.initState();
     appIdTextController.addListener(_onAppIdChanged);
   }
 
@@ -37,50 +34,49 @@ class _PreferencesPageState extends State<PreferencesPage> {
         //appBar: AppBar(title: new Text(widget.title)),
         body: Container(
             child: Column(mainAxisSize: MainAxisSize.max, children: [
-          getSettingsTitle('General settings'),
-          Row(
-            children: [
-              new Expanded(child: Text('Temp unit: '), flex: 1),
-              new Expanded(
-                child: DropdownButton<String>(
-                    value: tempUnitValue,
-                    items: tempUnits.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: new Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (val) => _onTempUnitChanged(val)),
-                flex: 3,
-              )
-            ],
-          ),
-          Row(
-            children: [
-              Expanded(child: Text('Api key: '), flex: 1),
-              Expanded(
-                  child: TextField(controller: appIdTextController), flex: 3)
-            ],
-          ),
-          getSettingsTitle('Charts settings'),
-          Row(
-            children: [
-              Expanded(child: Text('Fill area below plot: '), flex: 3),
-              Expanded(
-                  child: Checkbox(
-                      value: fillAreaBelow, onChanged: changeFillBelowPlotArea),
-                  flex: 1)
-            ],
-          ),
-          Row(
-            children: [
-              Expanded(child: Text('Show grid: '), flex: 3),
-              Expanded(
-                  child: Checkbox(value: showGrid, onChanged: changeShowGrid),
-                  flex: 1)
-            ],
+      getSettingsTitle('General settings'),
+      Row(
+        children: [
+          new Expanded(child: Text('Temp unit: '), flex: 1),
+          new Expanded(
+            child: DropdownButton<String>(
+                value: tempUnitValue,
+                items: tempUnits.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: new Text(value),
+                  );
+                }).toList(),
+                onChanged: (val) => _onTempUnitChanged(val)),
+            flex: 3,
           )
-        ])));
+        ],
+      ),
+      Row(
+        children: [
+          Expanded(child: Text('Api key: '), flex: 1),
+          Expanded(child: TextField(controller: appIdTextController), flex: 3)
+        ],
+      ),
+      getSettingsTitle('Charts settings'),
+      Row(
+        children: [
+          Expanded(child: Text('Fill area below plot: '), flex: 3),
+          Expanded(
+              child: Checkbox(
+                  value: fillAreaBelow, onChanged: changeFillBelowPlotArea),
+              flex: 1)
+        ],
+      ),
+      Row(
+        children: [
+          Expanded(child: Text('Show grid: '), flex: 3),
+          Expanded(
+              child: Checkbox(value: showGrid, onChanged: changeShowGrid),
+              flex: 1)
+        ],
+      )
+    ])));
   }
 
   Widget getSettingsTitle(String title) => Container(

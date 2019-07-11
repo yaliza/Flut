@@ -28,6 +28,7 @@ dependencies:
   intl: ^0.15.8
   archive: ^2.0.10
   flutter_spinkit: "^2.1.0"
+  path_provider: ^1.1.2
 
 dev_dependencies:
   flutter_test:
