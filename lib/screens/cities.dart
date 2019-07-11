@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/preferences_helper.dart';
-import 'package:flutter_app/entities/weather_data.dart';
 import 'package:flutter_app/api/request_helper.dart';
+import 'package:flutter_app/entities/weather_data.dart';
+import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/utils.dart';
-import 'search_city.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+import 'search_city.dart';
 
 class CitiesPage extends StatefulWidget {
   CitiesPage({Key key, this.title}) : super(key: key);

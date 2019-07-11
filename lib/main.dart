@@ -186,7 +186,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void changeTempUnit(String value) {
     setState(() {
       tempUnitValue = value;
-      print('temp unit is $value');
     });
   }
 

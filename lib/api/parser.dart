@@ -1,9 +1,10 @@
-import 'dart:isolate';
-import 'package:flutter_app/entities/weather_data.dart';
-import 'package:flutter_app/entities/city.dart';
-import 'package:flutter_app/entities/weather_info_predictions.dart';
-import 'package:archive/archive.dart';
 import 'dart:convert';
+import 'dart:isolate';
+
+import 'package:archive/archive.dart';
+import 'package:flutter_app/entities/city.dart';
+import 'package:flutter_app/entities/weather_data.dart';
+import 'package:flutter_app/entities/weather_info_predictions.dart';
 
 enum ParserWorkType { WEATHER_BY_IDS, CITIES_LIST_BYTES, WEATHER_PREDICTION }
 

@@ -10,18 +10,10 @@ String formatDateTimeFormat(int dt, int timeShiftSec) {
       : dateTimeFormat.format((utc.subtract(Duration(seconds: -timeShiftSec))));
 }
 
-String formatDateFullFormat(DateTime dt) {
-  return dateFullFormat.format(dt);
-}
+String formatDateFullFormat(DateTime dt) => dateFullFormat.format(dt);
 
-String getTempUnit(String value) {
-  return value == 'metric' ? '°C' : '°F';
-}
+String getTempUnit(String value) => value == 'metric' ? '°C' : '°F';
 
-String getWeatherIconUrl(String icon) {
-  return 'http://openweathermap.org/img/wn/$icon@2x.png';
-}
+String getWeatherIconUrl(String icon) => 'http://openweathermap.org/img/wn/$icon@2x.png';
 
-String getDefaultWeatherIcon() {
-  return 'place_holder.jpg';
-}
+String getDefaultWeatherIcon() => 'place_holder.jpg';

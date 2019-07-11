@@ -1,13 +1,14 @@
-import 'dart:isolate';
-import 'package:flutter_app/entities/weather_data.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_app/preferences_helper.dart';
-import 'package:flutter_app/entities/weather_info_predictions.dart';
-import 'dart:convert';
-import 'package:flutter_app/entities/city.dart';
-import 'parser.dart';
 import 'dart:io';
+import 'dart:isolate';
+
+import 'package:flutter_app/entities/city.dart';
+import 'package:flutter_app/entities/weather_data.dart';
+import 'package:flutter_app/entities/weather_info_predictions.dart';
+import 'package:flutter_app/preferences_helper.dart';
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+
+import 'parser.dart';
 
 class RequestHelper {
   static Parser _parser;
