@@ -50,9 +50,11 @@ class _CitiesPageState extends State<CitiesPage> {
           )),
       Expanded(
           flex: 1,
-          child: weatherData == null
-              ? SpinKitChasingDots(color: Colors.blueAccent, size: 50.0)
-              : getWidgetCitiesList())
+          child: citiesIds != null && citiesIds.length == 0
+              ? Center(child: Text('No data to display. Please, add cities.'))
+              : weatherData == null
+                  ? SpinKitChasingDots(color: Colors.blueAccent, size: 50.0)
+                  : getWidgetCitiesList())
     ]));
   }
 
@@ -118,7 +120,8 @@ class _CitiesPageState extends State<CitiesPage> {
   void _changeCitiesList(List<String> value) {
     if (value != null) {
       citiesIds = value;
-      RequestHelper.getCurrentWeatherByIds(_setWeatherData, () => {}, citiesIds);
+      RequestHelper.getCurrentWeatherByIds(
+          _setWeatherData, () => {}, citiesIds);
     }
   }
 

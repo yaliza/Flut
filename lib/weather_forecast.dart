@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app/preferences_helper.dart';
+import 'package:flutter_app/screens/preferences.dart';
 import 'package:http/http.dart' as http;
+
 import 'api/request_helper.dart';
 import 'entities/weather_info_predictions.dart';
 import 'package:flutter_app/screens/preferences.dart';
@@ -13,13 +17,22 @@ class WeatherForecast extends StatefulWidget{
 }
 
 class _WeatherForecastState extends State<WeatherForecast> {
-
   WeatherInfoPredictions predictions;
+  String cityId;
 
   _WeatherForecastState() {
+    PreferencesHelper.getCityId().then((val) => changeCityId(val));
     RequestHelper.getPredictions(
             (data) => changeWeatherData(data),
-            () => print('error'), "minsk");
+            () => print('error'),
+            cityId
+    );
+  }
+
+  void changeCityId(String cityId) {
+    setState(() {
+      this.cityId = cityId;
+    });
   }
 
 
