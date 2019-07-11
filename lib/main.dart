@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/preferences_helper.dart';
-import 'package:flutter_app/weather_forecast.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_app/screens/charts.dart';
+import 'package:flutter_app/screens/cities.dart';
+import 'package:flutter_app/screens/preferences.dart';
+
 import 'api/request_helper.dart';
 import 'entities/weather_data.dart';
-import 'preferences.dart';
-import 'charts.dart';
+import 'screens/preferences.dart';
+import 'screens/charts.dart';
 import 'entities/weather_icon.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:convert';
+import 'utils.dart';
 
 void main() => runApp(MyApp());
 
@@ -24,8 +27,66 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Weather'),
+      home: Home(),
       routes: routes,
+    );
+  }
+}
+
+class Home extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _HomeState();
+  }
+}
+
+class _HomeState extends State<Home> {
+  int _currentIndex = 0;
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  final List<Widget> _children = [
+    MyHomePage(title: 'Home'),
+    PreferencesPage(title: 'Preferences'),
+    ChartsPage(title: 'Charts'),
+    CitiesPage(title: 'Cities')
+  ];
+
+  void onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Weather'),
+      ),
+      body: _children[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: onTabTapped,
+        currentIndex: _currentIndex,
+        selectedItemColor: Colors.amber[800],
+        unselectedItemColor: Colors.blue,
+        items: [
+          BottomNavigationBarItem(
+            icon: new Icon(Icons.home),
+            title: new Text('Home', style: new TextStyle(color: Colors.blue)),
+          ),
+          BottomNavigationBarItem(
+            icon: new Icon(Icons.settings),
+            title:
+                new Text('Settings', style: new TextStyle(color: Colors.blue)),
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.show_chart),
+              title: Text('Chart', style: new TextStyle(color: Colors.blue))),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.location_city),
+              title: Text('Cities', style: new TextStyle(color: Colors.blue)))
+        ],
+      ),
     );
   }
 }
@@ -39,16 +100,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static List<String> dropdownValues = ['Minsk', 'Brest', 'Moscow', 'Vitebsk', 'London', 'Berlin'];
+  static List<String> dropdownValues = [
+    'Minsk',
+    'Brest',
+    'Moscow',
+    'Vitebsk',
+    'London',
+    'Berlin'
+  ];
 
   String dropdownValue = dropdownValues[0];
-  String temperature = '';
-  String mainDescription = '';
-  String description = '';
-  String icon = '';
-  int sunrise, sunset;
-  String sunriseText = '';
-  String sunsetText = '';
+  WeatherData weatherData;
   String tempUnitValue = '';
   List<WeatherIcon> icons;
 
@@ -64,26 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void changeWeatherData(WeatherData data) {
     PreferencesHelper.getTempUnit().then((val) => changeTempUnit(val));
     setState(() {
-      temperature = data.temp.toString();
-
-      if (tempUnitValue == 'metric') {
-        temperature += '°C';
-      }
-      else {
-        temperature += '°F';
-      }
-
-      mainDescription = data.mainDescription;
-      description = data.description;
-      icon = data.icon;
-      sunrise = data.sunrise;
-      sunset = data.sunset;
-
-      sunriseText = 'Sunset: ' +
-          new DateFormat.Hm().format(new DateTime.fromMillisecondsSinceEpoch(sunrise * 1000)).toString();
-
-      sunsetText = 'Sunset: ' +
-          new DateFormat.Hm().format(new DateTime.fromMillisecondsSinceEpoch(sunset * 1000)).toString();;
+      weatherData = data;
     });
   }
 
@@ -94,10 +137,17 @@ class _MyHomePageState extends State<MyHomePage> {
     rootBundle.loadString('assets/weather_conditions.json').then(parseWeatherIconsJson);
   }
 
-  void parseWeatherIconsJson(String data){
+  void parseWeatherIconsJson(String data) {
     setState(() {
-      icons = (json.decode(data) as List).map((js) => WeatherIcon.fromJson(js)).toList();
+      icons = (json.decode(data) as List)
+          .map((js) => WeatherIcon.fromJson(js))
+          .toList();
     });
+  }
+
+  _MyHomePageState() {
+    RequestHelper.getCurrentWeather(
+        (data) => changeWeatherData(data), () => print('error'));
   }
 
   @override
@@ -105,40 +155,10 @@ class _MyHomePageState extends State<MyHomePage> {
     AssetImage background;
     if (new DateTime.now().hour > 6 && new DateTime.now().hour < 20) {
       background = AssetImage("assets/day.jpg");
-    }
-    else {
+    } else {
       background = AssetImage("assets/night.jpg");
     }
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-          actions: <Widget>[
-            // action button
-            IconButton(
-              icon: Icon(settingsIcon),
-              onPressed: () {
-                Navigator.pushNamed(context, PreferencesPage.routeName);
-              },
-            ),
-            IconButton(
-                icon: Icon(Icons.playlist_add),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              WeatherForecastPage(title: 'Forecast')));
-                }),
-            IconButton(
-                icon: Icon(Icons.details),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ChartsPage(title: 'Charts')));
-                }),
-          ],
-        ),
         body: Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -175,31 +195,34 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: <Widget>[
                       ListTile(
                         leading: FadeInImage.assetNetwork(
-                            placeholder: 'place_holder.jpg',
-                            image: 'http://openweathermap.org/img/wn/' +
-                                icon +
-                                '@2x.png',
-                        ),
+                            placeholder: getDefaultWeatherIcon(),
+                            image: weatherData != null
+                                ? getWeatherIconUrl(weatherData.icon)
+                                : getWeatherIconUrl('')),
                         title: Text(
-                          temperature ?? '',
+                          weatherData != null
+                              ? '${weatherData.temp} ${getTempUnit(tempUnitValue)}'
+                              : '',
                           style: TextStyle(fontSize: 32.0),
                         ),
-                        subtitle: Column(
-                          children:<Widget>[
-                            Text(
-                              description ?? '',
-                              style: TextStyle(fontSize: 22.0),
-                            ),
-                            Text(
-                                sunriseText ?? '',
-                              style: TextStyle(fontSize: 22.0),
-                            ),
-                            Text(
-                              sunsetText ?? '',
-                              style: TextStyle(fontSize: 22.0),
-                            ),
-                          ]
-                      ),
+                        subtitle: Column(children: <Widget>[
+                          Text(
+                            weatherData != null ? weatherData.description : '',
+                            style: TextStyle(fontSize: 22.0),
+                          ),
+                          Text(
+                            weatherData != null
+                                ? 'Sunrise: ${formatDateTimeFormat(weatherData.sunrise * 1000, weatherData.timezone)}'
+                                : '',
+                            style: TextStyle(fontSize: 22.0),
+                          ),
+                          Text(
+                            weatherData != null
+                                ? 'Sunset: ${formatDateTimeFormat(weatherData.sunset * 1000, weatherData.timezone)}'
+                                : '',
+                            style: TextStyle(fontSize: 22.0),
+                          ),
+                        ]),
                       )
                     ],
                   ),

@@ -19,7 +19,27 @@ class PreferencesHelper {
   static List<WeatherIcon> icons;
 
   static Future<String> getIcons(Function(List<WeatherIcon>) callback, Function error) async {
-    return await rootBundle.loadString('assets/weather_conditions.json').then((val) => json.decode(val));
+    return await rootBundle.loadString('assets/weather_conditions.json').then((
+        val) => json.decode(val));
+  }
+
+  static final String _fillAreaBelowPlotKey = "FILL_AREA_BELOW_PLOT";
+  static final bool _defaultFillAreaBelowPlot = true;
+
+  static final String _showGridKey = "SHOW_GRID";
+  static final bool _defaultShowGrid = true;
+
+  static final String _cityIdKey = "DEFAULT_CITY_ID";
+  static final String _defaultCityId = "625144";
+
+  static Future<String> getCityId() async {
+    return getString(_cityIdKey, _defaultCityId);
+  }
+
+  static final _citiesKey = 'CITIES';
+
+  static Future<bool> setCityId(String value) {
+    return setString(_cityIdKey, value);
   }
 
   static Future<String> getAppId() async {
@@ -46,6 +66,30 @@ class PreferencesHelper {
     return setString(_cityKey, value);
   }
 
+  static Future<bool> getFillAreaBelowPlot() {
+    return getBoolean(_fillAreaBelowPlotKey, _defaultFillAreaBelowPlot);
+  }
+
+  static Future<bool> setFillAreBelowPlot(bool value) async {
+    return setBool(_fillAreaBelowPlotKey, value);
+  }
+
+  static Future<List<String>> getMarkedCitiesIds() async {
+    return getStringList(_citiesKey, []);
+  }
+
+  static Future<bool> setMarkedCitiesIds(List<String> list) async {
+    return setStringList(_citiesKey, list);
+  }
+
+  static Future<bool> getShowGrid() {
+    return getBoolean(_showGridKey, _defaultShowGrid);
+  }
+
+  static Future<bool> setShowGrid(bool value) async {
+    return setBool(_showGridKey, value);
+  }
+
   static Future<String> getString(String key, String def) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(key) ?? def;
@@ -54,5 +98,25 @@ class PreferencesHelper {
   static Future<bool> setString(String key, String value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setString(key, value);
+  }
+
+  static Future<bool> getBoolean(String key, bool def) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(key) ?? def;
+  }
+
+  static Future<bool> setBool(String key, bool value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setBool(key, value);
+  }
+
+  static Future<List<String>> getStringList(String key, List<String> def) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(key) ?? def;
+  }
+
+  static Future<bool> setStringList(String key, List<String> val) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setStringList(key, val);
   }
 }
