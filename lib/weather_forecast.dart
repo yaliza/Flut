@@ -47,25 +47,25 @@ class _WeatherForecastState extends State<WeatherForecast> {
     String res;
     switch(i) {
       case 1:
-        res = "Monday";
+        res = "Monday   ";
         break;
       case 2:
-        res = "Tuesday";
+        res = "Tuesday  ";
         break;
       case 3:
         res = "Wednesday";
         break;
       case 4:
-        res = "Thursday";
+        res = "Thursday ";
         break;
       case 5:
-        res = "Friday";
+        res = "Friday   ";
         break;
       case 6:
-        res = "Saturday";
+        res = "Saturday ";
         break;
       case 7:
-        res = "Sunday";
+        res = "Sunday   ";
         break;
     }
     return res;
@@ -73,7 +73,6 @@ class _WeatherForecastState extends State<WeatherForecast> {
 
   Row hourlyPredictions() {
     List<Widget> list = new List<Widget>();
-
     if(predictions != null) {
       for (var i = 0; i < 6; i++) {
         List<Widget> contents = new List<Widget>();
@@ -102,12 +101,11 @@ class _WeatherForecastState extends State<WeatherForecast> {
 
   Column dailyPredictions() {
     List<Widget> list = new List<Widget>();
-
     if(predictions != null) {
       for (var i = 0; i < predictions.predictions.length; i += 8) {
         List<Widget> contents = new List<Widget>();
         contents.add(new Text("   " + getWeekDay(predictions.predictions[i].dateTime.weekday),
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 17),));
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 17)));
         contents.add(new FadeInImage.assetNetwork(
             height: 100,
             placeholder: getDefaultWeatherIcon(),
