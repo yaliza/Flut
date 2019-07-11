@@ -23,5 +23,5 @@ String getWeatherIconUrl(String icon) {
 }
 
 String getDefaultWeatherIcon() {
-  return 'placeholder.jpg';
+  return 'place_holder.jpg';
 }

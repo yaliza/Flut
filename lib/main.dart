@@ -1,10 +1,14 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/screens/charts.dart';
 import 'package:flutter_app/screens/cities.dart';
 import 'package:flutter_app/screens/preferences.dart';
+import 'package:location/location.dart';
 
 import 'api/request_helper.dart';
+import 'entities/city.dart';
 import 'entities/weather_data.dart';
 import 'screens/preferences.dart';
 import 'screens/charts.dart';
@@ -114,12 +118,65 @@ class _MyHomePageState extends State<MyHomePage> {
   String tempUnitValue = '';
   List<WeatherIcon> icons;
 
+  var location = new Location();
+  Map<String, double> userLocation;
+  List<String> citiesNearby;
+  List<City> cities;
+  List<City> filteredCities = [];
+  String filter = '';
+
+  Future<Map<String, double>> getLocation() async {
+    var currentLocation = <String, double>{};
+    try {
+      currentLocation = await location.getLocation();
+    } catch (e) {
+      currentLocation = null;
+    }
+    return currentLocation;
+  }
+
+  void changeCitiesList(List<City> value) {
+    setState(() {
+      cities = value;
+    });
+    filterCities();
+  }
+
+  void filterCities() async {
+    if (filter.isNotEmpty) {
+      var result = cities
+          .where(
+              (city) => city.name.toLowerCase().contains(filter.toLowerCase()))
+          .toList();
+      setState(() {
+        filteredCities = result;
+      });
+    }
+  }
+
+  void getCitiesNearby() {
+    RequestHelper.getCitiesList(changeCitiesList, () => {});
+    double userLatitude = userLocation['latitude'];
+    double userLongitude = userLocation['longitude'];
+    for (City city in filteredCities) {
+      if (sqrt(pow(userLatitude - city.latitude, 2) + pow(userLongitude - city.longitude, 2)) < 10) {
+        citiesNearby.add(city.name);
+      }
+    }
+  }
+
   static const IconData settingsIcon =
       IconData(0xe8b8, fontFamily: 'MaterialIcons');
 
   void changeTempUnit(String value) {
     setState(() {
       tempUnitValue = value;
+    });
+  }
+
+  void changeUserLocation(Map<String, double> location) {
+    setState(() {
+      userLocation = location;
     });
   }
 
@@ -133,8 +190,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    getLocation().then((val) => changeUserLocation(val));
     RequestHelper.getCurrentWeather(changeWeatherData,() => print('error'));
     rootBundle.loadString('assets/weather_conditions.json').then(parseWeatherIconsJson);
+    getCitiesNearby();
   }
 
   void parseWeatherIconsJson(String data) {
