@@ -113,6 +113,32 @@ class _MyHomePageState extends State<MyHomePage> {
   WeatherData weatherData;
   String tempUnitValue = '';
   List<WeatherIcon> icons;
+  String iconUrl = '';
+
+  List<String> weatherConditionsMainDescription = ['thunderstorm', 'drizzle', 'snow'];
+
+  void getIconUrl() {
+    for (WeatherIcon icon in icons) {
+      if (weatherConditionsMainDescription.contains(icon.description)) {
+        if (icon.description == weatherData.mainDescription) {
+          if (new DateTime.now().hour > 6 && new DateTime.now().hour < 20) {
+            iconUrl = icon.day;
+          } else {
+            iconUrl = icon.night;
+          }
+          break;
+        }
+      }
+      if (icon.description == weatherData.description) {
+        if (new DateTime.now().hour > 6 && new DateTime.now().hour < 20) {
+          iconUrl = icon.day;
+        } else {
+          iconUrl = icon.night;
+        }
+        break;
+      }
+    }
+  }
 
   static const IconData settingsIcon =
       IconData(0xe8b8, fontFamily: 'MaterialIcons');
@@ -128,6 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       weatherData = data;
     });
+    getIconUrl();
   }
 
   @override
@@ -196,9 +223,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ListTile(
                         leading: FadeInImage.assetNetwork(
                             placeholder: getDefaultWeatherIcon(),
-                            image: weatherData != null
-                                ? getWeatherIconUrl(weatherData.icon)
-                                : getWeatherIconUrl('')),
+                            image: iconUrl),
                         title: Text(
                           weatherData != null
                               ? '${weatherData.temp} ${getTempUnit(tempUnitValue)}'
