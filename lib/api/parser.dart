@@ -14,8 +14,12 @@ class Parser {
 
   Future startWork() async {
     receivePort = ReceivePort();
-    isolate = await Isolate.spawn(doWork, receivePort.sendPort);
+    isolate = await Isolate.spawn(doWork, receivePort.sendPort, errorsAreFatal: false);
     return;
+  }
+
+  Future endWork() async {
+    isolate.kill();
   }
 
   static void doWork(SendPort sendPort) async {

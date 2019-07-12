@@ -69,6 +69,10 @@ class RequestHelper {
         bytes = response.bodyBytes;
         file.writeAsBytesSync(bytes);
       }
+      if(_parser != null){
+        _parser.endWork();
+        _parser = null;
+      }
       Parser parser = Parser();
       await parser.startWork();
       _sendParserWork = await parser.receivePort.first;
@@ -76,7 +80,7 @@ class RequestHelper {
       _sendParserWork.send(
           [receiveJsonPort.sendPort, bytes, ParserWorkType.CITIES_LIST_BYTES]);
       _cities = await receiveJsonPort.first;
-      parser.isolate.kill();
+      await parser.endWork();
     }
     callback(_cities);
     return true;
