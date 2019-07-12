@@ -112,6 +112,7 @@ class _WeatherForecastState extends State<WeatherForecast> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(4294967295).withOpacity(0.6),
         body: Center(
             child: ListView(
               children: <Widget>[
