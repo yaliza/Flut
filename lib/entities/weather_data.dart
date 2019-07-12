@@ -1,4 +1,5 @@
 class WeatherData {
+  final String cityId;
   final String cityName;
   final String mainDescription;
   final String description;
@@ -9,7 +10,7 @@ class WeatherData {
   final int dt;
   final int timezone;
 
-  WeatherData({this.cityName, this.mainDescription, this.description, this.icon, this.temp, this.sunrise, this.sunset, this.dt, this.timezone});
+  WeatherData({this.cityName, this.mainDescription, this.description, this.icon, this.temp, this.sunrise, this.sunset, this.dt, this.timezone, this.cityId});
 
   String toString() {return temp.toString();}
 
@@ -23,10 +24,11 @@ class WeatherData {
         sunrise: json['sys']['sunrise'],
         sunset: json['sys']['sunset'],
         dt: json['dt'],
-        timezone: json['timezone']
+        timezone: json['timezone'],
+        cityId: json['id'].toString()
     );
   }
-  
+
   factory WeatherData.fromJsonCitiesIds(Map<String, dynamic> json) {
     return WeatherData(
       cityName: json['name'],
@@ -37,7 +39,8 @@ class WeatherData {
       sunrise: json['sys']['sunrise'],
       sunset: json['sys']['sunset'],
       dt: json['dt'],
-      timezone: json['sys']['timezone']
+      timezone: json['sys']['timezone'],
+        cityId: json['id'].toString()
     );
   }
 }

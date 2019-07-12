@@ -1,33 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/api/request_helper.dart';
 import 'package:flutter_app/entities/weather_info_predictions.dart';
-import 'package:flutter_app/preferences_helper.dart';
 import 'package:flutter_app/utils.dart';
 
 class WeatherForecast extends StatefulWidget{
+
+  final String cityId;
+  final String tempUnitValue;
+
+  WeatherForecast({Key key, this.cityId, this.tempUnitValue}) : super(key: key);
+
   @override
   _WeatherForecastState createState() => _WeatherForecastState();
 }
 
 class _WeatherForecastState extends State<WeatherForecast> {
   WeatherInfoPredictions predictions;
-  String cityId;
 
-  _WeatherForecastState() {
-    PreferencesHelper.getCityId().then((val) => changeCityId(val));
+  @override
+  void initState() {
+    super.initState();
+    RequestHelper.getPredictions(changeWeatherData, () => print('error'), widget.cityId);
   }
-
-  void changeCityId(String cityId) {
-    setState(() {
-      this.cityId = cityId;
-      RequestHelper.getPredictions(
-              (data) => changeWeatherData(data),
-              () => print('error'),
-          cityId
-      );
-    });
-  }
-
 
   void changeWeatherData(WeatherInfoPredictions predictions) {
     setState(() {
@@ -91,24 +85,25 @@ class _WeatherForecastState extends State<WeatherForecast> {
     return new Row(children: list);
   }
 
+  Widget _expanded(Widget child, int flex) =>  Expanded(flex: flex, child: child);
+
   Column dailyPredictions() {
     List<Widget> list = new List<Widget>();
     if(predictions != null) {
       for (var i = 0; i < predictions.predictions.length; i += 8) {
         List<Widget> contents = new List<Widget>();
-        contents.add(new Text("   " + getWeekDay(predictions.predictions[i].dateTime.weekday),
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 17)));
-        contents.add(new FadeInImage.assetNetwork(
+        contents.add(_expanded(Text("${getWeekDay(predictions.predictions[i].dateTime.weekday)}",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 17)), 2));
+
+        contents.add(_expanded(FadeInImage.assetNetwork(
             height: 100,
             placeholder: getDefaultWeatherIcon(),
             image: predictions.predictions[i] != null
                 ? getWeatherIconUrl(predictions.predictions[i].icon)
-                : getWeatherIconUrl('')));
-        contents.add(new Text(predictions.predictions[i].tempmax.toString() + "   ",
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black26),));
-        contents.add(new Text(predictions.predictions[i].tempmin.toString(),
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),));
-        list.add(new Row(children: contents));
+                : getWeatherIconUrl('')), 3));
+        contents.add(_expanded(Text("${predictions.predictions[i].temp.toStringAsFixed(0)} ${getTempUnit(widget.tempUnitValue)}",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black26)), 1));
+        list.add(Row(children: contents));
       }
     }
     return new Column(children: list);

@@ -7,9 +7,6 @@ class PreferencesHelper {
   static final String _tempUnitKey = "TEMP";
   static final String _defaultTemptUnit = "metric";
 
-  static final String _cityKey = "CITY";
-  static final String _defaultCity = "minsk";
-
   static final String _fillAreaBelowPlotKey = "FILL_AREA_BELOW_PLOT";
   static final bool _defaultFillAreaBelowPlot = true;
 
@@ -25,10 +22,6 @@ class PreferencesHelper {
 
   static final _citiesKey = 'CITIES';
 
-  static Future<bool> setCityId(String value) {
-    return setString(_cityIdKey, value);
-  }
-
   static Future<String> getAppId() async {
     return getString(_appIdKey, _defaultAppId);
   }
@@ -43,14 +36,6 @@ class PreferencesHelper {
 
   static Future<bool> setTempUnit(String value) async {
     return setString(_tempUnitKey, value);
-  }
-
-  static Future<String> getCity() {
-    return getString(_cityKey, _defaultCity);
-  }
-
-  static Future<bool> setCity(String value) async {
-    return setString(_cityKey, value);
   }
 
   static Future<bool> getFillAreaBelowPlot() {

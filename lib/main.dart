@@ -195,7 +195,6 @@ class _MyHomePageState extends State<MyHomePage> {
         changeCitiesWeather, () => {}, loc['latitude'], loc['longitude']);
   }
 
-
   void parseWeatherIconsJson(String data) {
     setState(() {
       icons = (json.decode(data) as List)
@@ -230,7 +229,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 fit: BoxFit.cover,
               ),
             ),
-            child: ListView(
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 dropdownValues != null && dropdownValues.length > 0
                     ? Center(
@@ -287,7 +287,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       )
                     ],
                   ),
-                ), Container(child: WeatherForecast(), height: 300, width: 100,)
-    ]) ), /*bottomSheet: WeatherForecast(),*/);
+                ),
+                Expanded(
+                  flex: 1,
+                  child:currentWeatherData != null ? Container(
+                      height : 400,
+                      child: WeatherForecast(key: Key(currentWeatherData.cityId + tempUnitValue) ,cityId: currentWeatherData.cityId, tempUnitValue: tempUnitValue)) : Container(),
+                )
+    ])));
   }
 }
